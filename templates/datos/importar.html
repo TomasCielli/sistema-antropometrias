@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Importar Datos — Albatros Rugby Club{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Importar Datos</h2>
+    <a href="{{ url_for('jugadores.listar') }}" class="btn btn-outline-secondary">Volver</a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">Subir archivo Excel</h5>
+        <p class="text-muted">
+            El archivo debe ser <code>.xlsx</code> con dos hojas: <strong>Jugadores</strong> y <strong>Antropometrias</strong>.
+            Si un jugador del archivo ya existe, se te mostrará la diferencia para que puedas elegir qué versión conservar.
+            Las antropometrías con misma fecha y jugador serán omitidas.
+        </p>
+        <form method="POST" action="{{ url_for('datos.procesar_importacion') }}" enctype="multipart/form-data">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-8">
+                    <label for="archivo" class="form-label">Archivo Excel (.xlsx)</label>
+                    <input type="file" class="form-control" id="archivo" name="archivo" accept=".xlsx" required>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary w-100">Importar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">Formato esperado</div>
+    <div class="card-body">
+        <h6>Hoja "Jugadores"</h6>
+        <p class="small text-muted">
+            Columnas: id, apellido, nombre, dni, sexo, posicion_actual, categoria_actual, fecha_nacimiento, objetivo, creado_en
+        </p>
+        <h6>Hoja "Antropometrias"</h6>
+        <p class="small text-muted mb-1">
+            Columnas: id, jugador_id, jugador_apellido, jugador_nombre, fecha, posicion, categoria,
+            peso, talla_corporal, talla_sentado, biacromial, torax_transverso, torax_anteroposterior,
+            bi_iliocrestideo, humeral, femoral, cabeza, brazo_relajado, brazo_flexionado, antebrazo,
+            torax_mesoesternal, cintura, cadera, muslo_maximo, muslo_medial, pantorrilla_maxima,
+            triceps, subescapular, supraespinal, abdominal, muslo_medial_pliegue, pantorrilla_pliegue,
+            biceps, cresta_iliaca
+        </p>
+        <p class="small text-muted mb-0">
+            <strong>Tip:</strong> Usá <a href="{{ url_for('datos.exportar') }}">Exportar</a> para generar un archivo con el formato correcto.
+        </p>
+    </div>
+</div>
+{% endblock %}

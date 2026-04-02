@@ -1,0 +1,27 @@
+/* Custom styles for Albatros Rugby Club - Antropometrías */
+
+body {
+    background-color: #f8f9fa;
+}
+
+.navbar-brand {
+    font-weight: 700;
+}
+
+.card-header {
+    font-weight: 600;
+}
+
+.table th {
+    white-space: nowrap;
+}
+
+.btn-group-actions .btn {
+    margin-right: 0.25rem;
+}
+
+.flash-container {
+    position: sticky;
+    top: 56px;
+    z-index: 1020;
+}

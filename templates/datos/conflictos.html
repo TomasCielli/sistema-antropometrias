@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Conflictos en la importación — Albatros Rugby Club{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Conflictos detectados en la importación</h2>
+    <a href="{{ url_for('datos.importar') }}" class="btn btn-outline-secondary">Cancelar</a>
+</div>
+
+<div class="alert alert-warning">
+    <strong>Se encontraron {{ conflictos|length }} jugador(es) con datos diferentes al archivo importado.</strong>
+    Revisá cada caso y elegí qué versión querés conservar. Los jugadores nuevos ({{ total_nuevos }}) y las
+    antropometrías ({{ total_antro }}) se procesarán junto con tu decisión.
+</div>
+
+<form method="POST" action="{{ url_for('datos.resolver_conflictos') }}">
+
+    {% for c in conflictos %}
+    <div class="card mb-4 border-warning">
+        <div class="card-header bg-warning bg-opacity-25">
+            <strong>DNI: {{ c.dni }}</strong>
+            — {{ c.nombre_db }}
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered mb-3">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Campo</th>
+                            <th>Base de datos actual</th>
+                            <th>Archivo importado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for d in c.diferencias %}
+                        <tr class="table-warning">
+                            <td><strong>{{ d.label }}</strong></td>
+                            <td>{{ d.valor_db }}</td>
+                            <td>{{ d.valor_importado }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-flex gap-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio"
+                           name="decision_{{ c.dni }}"
+                           id="mantener_{{ c.dni }}"
+                           value="mantener" checked>
+                    <label class="form-check-label" for="mantener_{{ c.dni }}">
+                        <strong>Mantener</strong> el registro actual
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio"
+                           name="decision_{{ c.dni }}"
+                           id="sobreescribir_{{ c.dni }}"
+                           value="sobreescribir">
+                    <label class="form-check-label" for="sobreescribir_{{ c.dni }}">
+                        <strong>Sobreescribir</strong> con el importado
+                    </label>
+                </div>
+            </div>
+
+            {# Hidden fields with imported data for overwrite case #}
+            {% for campo, valor in c.datos_importados.items() %}
+            <input type="hidden" name="datos_{{ c.dni }}_{{ campo }}" value="{{ valor or '' }}">
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+
+    {% if errores_jug or errores_ant %}
+    <div class="card mb-4 border-danger">
+        <div class="card-header bg-danger bg-opacity-10">
+            <strong>Errores detectados en el archivo</strong>
+            (estas filas serán ignoradas)
+        </div>
+        <div class="card-body">
+            <ul class="mb-0 small text-danger">
+                {% for e in errores_jug %}
+                <li>{{ e }}</li>
+                {% endfor %}
+                {% for e in errores_ant %}
+                <li>{{ e }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="d-flex gap-2 mb-5">
+        <button type="submit" class="btn btn-primary">Confirmar e importar</button>
+        <a href="{{ url_for('datos.importar') }}" class="btn btn-outline-secondary">Cancelar</a>
+    </div>
+</form>
+{% endblock %}

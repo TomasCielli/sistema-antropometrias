@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Editar Medición — {{ jugador.apellido }}, {{ jugador.nombre }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2>Editar Medición</h2>
+        <p class="text-muted mb-0">{{ jugador.apellido }}, {{ jugador.nombre }} — DNI: {{ jugador.dni }}</p>
+    </div>
+    <a href="{{ url_for('antropometrias.historial', id=jugador.id) }}" class="btn btn-outline-secondary">Volver</a>
+</div>
+
+<form method="POST" action="{{ url_for('antropometrias.actualizar', id=antropometria.get('id')) }}">
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <label for="fecha" class="form-label">Fecha *</label>
+            <input type="date" class="form-control" id="fecha" name="fecha"
+                   value="{{ antropometria.get('fecha', '') }}" required>
+        </div>
+        <div class="col-md-4">
+            <label for="posicion" class="form-label">Posición</label>
+            <select class="form-select" id="posicion" name="posicion">
+                <option value="">— Posición —</option>
+                {% for p in posiciones %}
+                <option value="{{ p }}" {% if antropometria.get('posicion') == p %}selected{% endif %}>{{ p }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label for="categoria" class="form-label">Categoría</label>
+            <select class="form-select" id="categoria" name="categoria">
+                <option value="">— Categoría —</option>
+                {% for c in categorias %}
+                <option value="{{ c }}" {% if antropometria.get('categoria') == c %}selected{% endif %}>{{ c }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    {% for seccion_nombre, campos in secciones %}
+    <div class="card mb-4">
+        <div class="card-header">{{ seccion_nombre }}</div>
+        <div class="card-body">
+            <div class="row g-3">
+                {% for campo in campos %}
+                <div class="col-md-4">
+                    <label for="{{ campo }}" class="form-label">{{ labels[campo][0] }}</label>
+                    <input type="number" step="0.01" min="0"
+                           class="form-control" id="{{ campo }}" name="{{ campo }}"
+                           value="{{ antropometria.get(campo, '') if antropometria.get(campo) is not none else '' }}"
+                           placeholder="{{ labels[campo][1] }}">
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="mt-3 mb-5">
+        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+        <a href="{{ url_for('antropometrias.historial', id=jugador.id) }}" class="btn btn-outline-secondary ms-2">Cancelar</a>
+    </div>
+</form>
+{% endblock %}
