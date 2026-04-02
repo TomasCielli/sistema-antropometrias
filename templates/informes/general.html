@@ -103,9 +103,15 @@
                         {% endfor %}
                     </tr>
                     <tr>
-                        <td>Masa Magra (kg)</td>
+                        <td>Masa Residual (kg)</td>
                         {% for m in item.mediciones %}
-                        <td class="text-center">{{ m.masa_magra if m.masa_magra is not none else '—' }}</td>
+                        <td class="text-center">{{ m.masa_residual if m.masa_residual is not none else '—' }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td>Masa Piel (kg)</td>
+                        {% for m in item.mediciones %}
+                        <td class="text-center">{{ m.masa_piel if m.masa_piel is not none else '—' }}</td>
                         {% endfor %}
                     </tr>
                 </tbody>
@@ -127,10 +133,11 @@
     <div class="card-body text-muted small">
         <strong>Fórmulas utilizadas:</strong>
         <ul class="mb-0">
-            <li><strong>% Grasa</strong> — Yuhasz modificada: Masc: (Σ6 × 0.1051) + 2.585 | Fem: (Σ6 × 0.1580) + 3.580</li>
-            <li><strong>Masa Muscular</strong> — Lee (2000)</li>
-            <li><strong>Masa Ósea</strong> — Von Döbeln-Rocha</li>
-            <li><strong>Masa Magra</strong> — Peso - Kg Grasa</li>
+            <li><strong>Masa Adiposa</strong> — ISAK / Ross & Kerr: (Σ6 × 0.1051) × SC</li>
+            <li><strong>Masa Muscular</strong> — Lee adaptada ISAK (perímetros corregidos)</li>
+            <li><strong>Masa Ósea</strong> — Rocha</li>
+            <li><strong>Masa Residual</strong> — H: peso × 0.241 | M: peso × 0.209</li>
+            <li><strong>Masa Piel</strong> — SC × 1.05</li>
         </ul>
     </div>
 </div>

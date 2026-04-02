@@ -1,10 +1,13 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
+import io
+from datetime import date
+from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, send_file
 from models.antropometrias import (
     CAMPOS_NUMERICOS, LABELS, SECCIONES,
     crear_antropometria, modificar_antropometria, eliminar_antropometria,
     obtener_antropometria_por_id, obtener_antropometrias_de_jugador
 )
 from models.jugadores import CATEGORIAS, POSICIONES, obtener_jugador_por_id
+from models.informes import calcular_composicion_completa, calcular_edad
 
 antropometrias_bp = Blueprint("antropometrias", __name__)
 
@@ -25,8 +28,8 @@ def nueva(id):
     jugador = obtener_jugador_por_id(id)
     if not jugador:
         abort(404)
-    # Pre-fill with player's current posicion and categoria
     antropometria = {
+        "fecha": date.today().isoformat(),
         "posicion": jugador.get("posicion_actual", ""),
         "categoria": jugador.get("categoria_actual", ""),
     }
@@ -111,6 +114,53 @@ def ver(id):
                            antropometria=antropometria,
                            secciones=SECCIONES,
                            labels=LABELS)
+
+
+@antropometrias_bp.route("/antropometrias/<int:id>/informe")
+def informe(id):
+    antropometria = obtener_antropometria_por_id(id)
+    if not antropometria:
+        abort(404)
+    jugador = obtener_jugador_por_id(antropometria["jugador_id"])
+    edad = calcular_edad(jugador.get("fecha_nacimiento"), antropometria.get("fecha"))
+    comp = calcular_composicion_completa(jugador, antropometria)
+    return render_template("antropometrias/informe.html",
+                           jugador=jugador,
+                           antropometria=antropometria,
+                           edad=edad,
+                           comp=comp,
+                           secciones=SECCIONES,
+                           labels=LABELS)
+
+
+@antropometrias_bp.route("/antropometrias/<int:id>/informe/pdf")
+def informe_pdf(id):
+    from xhtml2pdf import pisa
+
+    antropometria = obtener_antropometria_por_id(id)
+    if not antropometria:
+        abort(404)
+    jugador = obtener_jugador_por_id(antropometria["jugador_id"])
+    edad = calcular_edad(jugador.get("fecha_nacimiento"), antropometria.get("fecha"))
+    comp = calcular_composicion_completa(jugador, antropometria)
+
+    from flask import current_app
+    with current_app.test_request_context():
+        html = render_template("antropometrias/informe_pdf.html",
+                               jugador=jugador,
+                               antropometria=antropometria,
+                               edad=edad,
+                               comp=comp,
+                               secciones=SECCIONES,
+                               labels=LABELS)
+
+    result = io.BytesIO()
+    pisa.CreatePDF(io.StringIO(html), dest=result)
+    result.seek(0)
+
+    filename = f"informe_{jugador['apellido']}_{jugador['nombre']}_{antropometria['fecha']}.pdf"
+    return send_file(result, mimetype="application/pdf",
+                     as_attachment=True, download_name=filename)
 
 
 @antropometrias_bp.route("/antropometrias/<int:id>/editar", methods=["GET"])

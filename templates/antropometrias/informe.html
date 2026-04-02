@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% block title %}Informe — {{ jugador.apellido }}, {{ jugador.nombre }} — {{ antropometria.fecha }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2>Informe Antropométrico</h2>
+        <p class="text-muted mb-0">{{ jugador.apellido }}, {{ jugador.nombre }} — DNI: {{ jugador.dni }}</p>
+    </div>
+    <div>
+        <a href="{{ url_for('antropometrias.informe_pdf', id=antropometria.id) }}"
+           class="btn btn-danger">Descargar PDF</a>
+        <a href="{{ url_for('antropometrias.historial', id=jugador.id) }}"
+           class="btn btn-outline-secondary ms-2">Volver</a>
+    </div>
+</div>
+
+<!-- Datos del jugador -->
+<div class="card mb-4">
+    <div class="card-header">Datos del Jugador</div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3"><strong>Nombre:</strong> {{ jugador.apellido }}, {{ jugador.nombre }}</div>
+            <div class="col-md-2"><strong>Sexo:</strong> {{ jugador.sexo }}</div>
+            <div class="col-md-2"><strong>Edad:</strong> {{ edad if edad is not none else '—' }} años</div>
+            <div class="col-md-2"><strong>Posición:</strong> {{ antropometria.posicion or '—' }}</div>
+            <div class="col-md-3"><strong>Categoría:</strong> {{ antropometria.categoria or '—' }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Datos de la medición -->
+<div class="card mb-4">
+    <div class="card-header">Datos de la Medición — {{ antropometria.fecha }}</div>
+    <div class="card-body">
+        {% for seccion_nombre, campos in secciones %}
+        <h6 class="mt-3">{{ seccion_nombre }}</h6>
+        <div class="row g-2">
+            {% for campo in campos %}
+            <div class="col-md-3 col-6">
+                <small class="text-muted">{{ labels[campo][0] }}:</small>
+                {% if antropometria.get(campo) is not none %}
+                    <strong>{{ antropometria[campo] }}</strong> {{ labels[campo][1] }}
+                {% else %}
+                    <span class="text-muted">—</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Composición Corporal -->
+<div class="card mb-4">
+    <div class="card-header">Composición Corporal — Fraccionamiento en 5 Componentes</div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <strong>Superficie Corporal (Du Bois):</strong>
+                {{ comp.superficie_corporal if comp.superficie_corporal is not none else '—' }} m²
+            </div>
+            <div class="col-md-4">
+                <strong>Σ 6 pliegues:</strong>
+                {{ comp.suma_6_pliegues if comp.suma_6_pliegues is not none else '—' }} mm
+            </div>
+            <div class="col-md-4">
+                <strong>Σ 8 pliegues:</strong>
+                {{ comp.suma_8_pliegues if comp.suma_8_pliegues is not none else '—' }} mm
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Componente</th>
+                        <th class="text-center">Masa (kg)</th>
+                        <th class="text-center">% del Peso</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Masa Adiposa <small class="text-muted">(ISAK / Ross & Kerr)</small></td>
+                        <td class="text-center">{{ comp.masa_adiposa if comp.masa_adiposa is not none else '—' }}</td>
+                        <td class="text-center">{{ comp.pct_grasa if comp.pct_grasa is not none else '—' }}%</td>
+                    </tr>
+                    <tr>
+                        <td>Masa Muscular <small class="text-muted">(Lee adaptada ISAK)</small></td>
+                        <td class="text-center">{{ comp.masa_muscular if comp.masa_muscular is not none else '—' }}</td>
+                        <td class="text-center">{{ comp.pct_muscular if comp.pct_muscular is not none else '—' }}%</td>
+                    </tr>
+                    <tr>
+                        <td>Masa Ósea <small class="text-muted">(Rocha)</small></td>
+                        <td class="text-center">{{ comp.masa_osea if comp.masa_osea is not none else '—' }}</td>
+                        <td class="text-center">{{ comp.pct_osea if comp.pct_osea is not none else '—' }}%</td>
+                    </tr>
+                    <tr>
+                        <td>Masa Residual</td>
+                        <td class="text-center">{{ comp.masa_residual if comp.masa_residual is not none else '—' }}</td>
+                        <td class="text-center">{{ comp.pct_residual if comp.pct_residual is not none else '—' }}%</td>
+                    </tr>
+                    <tr>
+                        <td>Masa de Piel</td>
+                        <td class="text-center">{{ comp.masa_piel if comp.masa_piel is not none else '—' }}</td>
+                        <td class="text-center">{{ comp.pct_piel if comp.pct_piel is not none else '—' }}%</td>
+                    </tr>
+                </tbody>
+                <tfoot class="table-light">
+                    <tr>
+                        <th>Suma de componentes</th>
+                        <th class="text-center">{{ comp.suma_componentes if comp.suma_componentes is not none else '—' }}</th>
+                        <th class="text-center">
+                            {% if comp.suma_componentes is not none and antropometria.peso %}
+                                {{ ((comp.suma_componentes / antropometria.peso) * 100) | round(1) }}%
+                            {% else %}
+                                —
+                            {% endif %}
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>Peso real</th>
+                        <th class="text-center">{{ antropometria.peso if antropometria.peso is not none else '—' }}</th>
+                        <th class="text-center">100%</th>
+                    </tr>
+                    {% if comp.diferencia_peso is not none %}
+                    <tr class="{{ 'table-warning' if comp.diferencia_peso|abs > 2 else 'table-success' }}">
+                        <th>Diferencia</th>
+                        <th class="text-center">{{ comp.diferencia_peso }} kg</th>
+                        <th class="text-center">
+                            {% if comp.diferencia_peso|abs > 2 %}
+                                ⚠ Revisar mediciones
+                            {% else %}
+                                OK
+                            {% endif %}
+                        </th>
+                    </tr>
+                    {% endif %}
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Fórmulas -->
+<div class="card mb-5">
+    <div class="card-body text-muted small">
+        <strong>Fórmulas utilizadas:</strong>
+        <ul class="mb-0">
+            <li><strong>Superficie Corporal</strong> — Du Bois: SC = 0.007184 × peso⁰·⁴²⁵ × talla⁰·⁷²⁵</li>
+            <li><strong>Masa Adiposa</strong> — ISAK / Ross & Kerr: (Σ6 × 0.1051) × SC</li>
+            <li><strong>Masa Muscular</strong> — Lee adaptada ISAK (perímetros corregidos, raza: caucásico)</li>
+            <li><strong>Masa Ósea</strong> — Rocha: 3.02 × (talla² × húmero × fémur × 400)⁰·⁷¹²</li>
+            <li><strong>Masa Residual</strong> — Hombres: peso × 0.241 | Mujeres: peso × 0.209</li>
+            <li><strong>Masa de Piel</strong> — SC × 1.05</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
