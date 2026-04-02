@@ -146,7 +146,12 @@ def calcular_masa_piel(sc):
 # --- COMPOSICIÓN COMPLETA (para informe individual) ---
 
 def calcular_composicion_completa(jugador, antropometria):
-    """Calculate full 5-component body composition model."""
+    """Calculate full 5-component body composition model.
+
+    Residual mass is derived as the remainder (peso - other 4 components)
+    so the model always closes to 100%. The expected residual (fixed fraction)
+    is shown as a quality indicator — large deviation signals measurement error.
+    """
     peso = antropometria.get("peso")
     talla = antropometria.get("talla_corporal")
     sexo = jugador.get("sexo")
@@ -160,16 +165,17 @@ def calcular_composicion_completa(jugador, antropometria):
     masa_adiposa, pct_grasa = calcular_masa_adiposa(antropometria, peso, talla)
     masa_muscular = calcular_masa_muscular(antropometria, talla, sexo, edad)
     masa_osea = calcular_masa_osea(talla, antropometria.get("femoral"), antropometria.get("humeral"))
-    masa_residual = calcular_masa_residual(peso, sexo)
     masa_piel = calcular_masa_piel(sc)
 
-    # Validation: sum of components vs weight
-    suma_componentes = None
-    diferencia = None
-    if all(v is not None for v in [masa_adiposa, masa_muscular, masa_osea, masa_residual, masa_piel]):
-        suma_componentes = round(masa_adiposa + masa_muscular + masa_osea + masa_residual + masa_piel, 2)
-        if peso:
-            diferencia = round(peso - suma_componentes, 2)
+    # Residual = remainder so model always closes to 100%
+    masa_residual = None
+    residual_esperado = calcular_masa_residual(peso, sexo)
+    desviacion_residual = None
+
+    if all(v is not None for v in [peso, masa_adiposa, masa_muscular, masa_osea, masa_piel]):
+        masa_residual = round(peso - masa_adiposa - masa_muscular - masa_osea - masa_piel, 2)
+        if residual_esperado is not None:
+            desviacion_residual = round(masa_residual - residual_esperado, 2)
 
     return {
         "edad": edad,
@@ -184,10 +190,12 @@ def calcular_composicion_completa(jugador, antropometria):
         "pct_osea": round((masa_osea / peso) * 100, 2) if masa_osea and peso else None,
         "masa_residual": masa_residual,
         "pct_residual": round((masa_residual / peso) * 100, 2) if masa_residual and peso else None,
+        "residual_esperado": residual_esperado,
+        "desviacion_residual": desviacion_residual,
         "masa_piel": masa_piel,
         "pct_piel": round((masa_piel / peso) * 100, 2) if masa_piel and peso else None,
-        "suma_componentes": suma_componentes,
-        "diferencia_peso": diferencia,
+        "suma_componentes": peso,  # always closes
+        "diferencia_peso": 0,
     }
 
 

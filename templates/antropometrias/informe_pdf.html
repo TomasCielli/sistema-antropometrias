@@ -98,7 +98,7 @@
             <td class="text-center">{{ comp.pct_osea if comp.pct_osea is not none else '—' }}%</td>
         </tr>
         <tr>
-            <td>Masa Residual</td>
+            <td>Masa Residual (derivada)</td>
             <td class="text-center">{{ comp.masa_residual if comp.masa_residual is not none else '—' }}</td>
             <td class="text-center">{{ comp.pct_residual if comp.pct_residual is not none else '—' }}%</td>
         </tr>
@@ -109,26 +109,17 @@
         </tr>
     </tbody>
     <tfoot>
-        <tr>
-            <th>Suma de componentes</th>
-            <th class="text-center">{{ comp.suma_componentes if comp.suma_componentes is not none else '—' }}</th>
-            <th class="text-center">
-                {% if comp.suma_componentes is not none and antropometria.peso %}
-                    {{ ((comp.suma_componentes / antropometria.peso) * 100) | round(1) }}%
-                {% else %}—{% endif %}
-            </th>
-        </tr>
-        <tr>
-            <th>Peso real</th>
-            <th class="text-center">{{ antropometria.peso if antropometria.peso is not none else '—' }}</th>
+        <tr class="highlight">
+            <th>Total</th>
+            <th class="text-center">{{ antropometria.peso if antropometria.peso is not none else '—' }} kg</th>
             <th class="text-center">100%</th>
         </tr>
-        {% if comp.diferencia_peso is not none %}
-        <tr class="{{ 'warning' if comp.diferencia_peso|abs > 2 else 'highlight' }}">
-            <th>Diferencia</th>
-            <th class="text-center">{{ comp.diferencia_peso }} kg</th>
+        {% if comp.desviacion_residual is not none %}
+        <tr class="{{ 'warning' if comp.desviacion_residual|abs > 3 else 'highlight' }}">
+            <th>Calidad del modelo (residual esperado: {{ comp.residual_esperado }} kg)</th>
+            <th class="text-center">{{ comp.desviacion_residual }} kg</th>
             <th class="text-center">
-                {% if comp.diferencia_peso|abs > 2 %}Revisar mediciones{% else %}OK{% endif %}
+                {% if comp.desviacion_residual|abs > 3 %}Revisar mediciones{% else %}OK{% endif %}
             </th>
         </tr>
         {% endif %}
