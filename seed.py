@@ -42,12 +42,12 @@ c.execute("SELECT id, dni FROM jugadores")
 id_map = {row["dni"]: row["id"] for row in c.fetchall()}
 
 # Base anthropometry template (realistic rugby player values)
-def antro(jid, fecha, peso, talla, sexo_m=True, variacion=0):
+def antro(jid, fecha, peso, talla, posicion, categoria, sexo_m=True, variacion=0):
     """Generate a realistic anthropometry record with slight variations."""
     v = variacion
     is_m = sexo_m
     return (
-        jid, fecha,
+        jid, fecha, posicion, categoria,
         peso + v, talla,                         # peso, talla_corporal
         talla * 0.52,                             # talla_sentado
         42 + v * 0.1 if is_m else 38 + v * 0.1,  # biacromial
@@ -66,71 +66,71 @@ def antro(jid, fecha, peso, talla, sexo_m=True, variacion=0):
         6 + v * 0.2, 14 + v * 0.5,               # biceps, cresta_iliaca
     )
 
-campos_antro = """jugador_id, fecha, peso, talla_corporal, talla_sentado,
+campos_antro = """jugador_id, fecha, posicion, categoria, peso, talla_corporal, talla_sentado,
     biacromial, torax_transverso, torax_anteroposterior, bi_iliocrestideo,
     humeral, femoral, cabeza, brazo_relajado, brazo_flexionado, antebrazo,
     torax_mesoesternal, cintura, cadera, muslo_maximo, muslo_medial,
     pantorrilla_maxima, triceps, subescapular, supraespinal, abdominal,
     muslo_medial_pliegue, pantorrilla_pliegue, biceps, cresta_iliaca"""
 
-placeholders = ", ".join(["?"] * 29)
+placeholders = ", ".join(["?"] * 31)
 sql = f"INSERT INTO antropometrias ({campos_antro}) VALUES ({placeholders})"
 
 # Player 1: Gonzalez - 4 measurements
 jid = id_map["40111001"]
-c.execute(sql, antro(jid, "2025-06-15", 92, 182, True, 0))
-c.execute(sql, antro(jid, "2025-09-20", 94, 182, True, 1))
-c.execute(sql, antro(jid, "2026-01-10", 95, 182, True, 2))
-c.execute(sql, antro(jid, "2026-03-28", 96, 182, True, 2.5))
+c.execute(sql, antro(jid, "2025-06-15", 92, 182, "Pilar", "Plantel Superior", True, 0))
+c.execute(sql, antro(jid, "2025-09-20", 94, 182, "Pilar", "Plantel Superior", True, 1))
+c.execute(sql, antro(jid, "2026-01-10", 95, 182, "Pilar", "Plantel Superior", True, 2))
+c.execute(sql, antro(jid, "2026-03-28", 96, 182, "Pilar", "Plantel Superior", True, 2.5))
 
 # Player 2: Rodriguez - 3 measurements
 jid = id_map["41222002"]
-c.execute(sql, antro(jid, "2025-08-01", 65, 168, False, 0))
-c.execute(sql, antro(jid, "2025-12-15", 64, 168, False, -0.5))
-c.execute(sql, antro(jid, "2026-03-20", 63, 168, False, -1))
+c.execute(sql, antro(jid, "2025-08-01", 65, 168, "Centro", "M19", False, 0))
+c.execute(sql, antro(jid, "2025-12-15", 64, 168, "Centro", "M19", False, -0.5))
+c.execute(sql, antro(jid, "2026-03-20", 63, 168, "Centro", "M19", False, -1))
 
 # Player 3: Fernandez - 5 measurements (most data)
 jid = id_map["42333003"]
-c.execute(sql, antro(jid, "2025-03-10", 105, 178, True, 4))
-c.execute(sql, antro(jid, "2025-06-22", 103, 178, True, 3))
-c.execute(sql, antro(jid, "2025-09-15", 101, 178, True, 2))
-c.execute(sql, antro(jid, "2025-12-20", 99, 178, True, 1))
-c.execute(sql, antro(jid, "2026-03-25", 97, 178, True, 0))
+c.execute(sql, antro(jid, "2025-03-10", 105, 178, "Hooker", "Plantel Superior", True, 4))
+c.execute(sql, antro(jid, "2025-06-22", 103, 178, "Hooker", "Plantel Superior", True, 3))
+c.execute(sql, antro(jid, "2025-09-15", 101, 178, "Hooker", "Plantel Superior", True, 2))
+c.execute(sql, antro(jid, "2025-12-20", 99, 178, "Hooker", "Plantel Superior", True, 1))
+c.execute(sql, antro(jid, "2026-03-25", 97, 178, "Hooker", "Plantel Superior", True, 0))
 
 # Player 4: Lopez - 2 measurements
 jid = id_map["43444004"]
-c.execute(sql, antro(jid, "2025-10-05", 60, 165, False, 0))
-c.execute(sql, antro(jid, "2026-02-18", 61, 165, False, 0.5))
+c.execute(sql, antro(jid, "2025-10-05", 60, 165, "Wing", "M18", False, 0))
+c.execute(sql, antro(jid, "2026-02-18", 61, 165, "Wing", "M18", False, 0.5))
 
 # Player 5: Martinez - 4 measurements
 jid = id_map["44555005"]
-c.execute(sql, antro(jid, "2025-04-01", 108, 195, True, 3))
-c.execute(sql, antro(jid, "2025-07-15", 110, 195, True, 3.5))
-c.execute(sql, antro(jid, "2025-11-20", 111, 195, True, 4))
-c.execute(sql, antro(jid, "2026-03-15", 112, 195, True, 4.5))
+c.execute(sql, antro(jid, "2025-04-01", 108, 195, "Segunda línea", "Plantel Superior", True, 3))
+c.execute(sql, antro(jid, "2025-07-15", 110, 195, "Segunda línea", "Plantel Superior", True, 3.5))
+c.execute(sql, antro(jid, "2025-11-20", 111, 195, "Segunda línea", "Plantel Superior", True, 4))
+c.execute(sql, antro(jid, "2026-03-15", 112, 195, "Segunda línea", "Plantel Superior", True, 4.5))
 
 # Player 6: Garcia - 1 measurement
 jid = id_map["45666006"]
-c.execute(sql, antro(jid, "2026-03-01", 55, 160, False, 0))
+c.execute(sql, antro(jid, "2026-03-01", 55, 160, "Apertura", "M17", False, 0))
 
 # Player 7: Diaz - 3 measurements
 jid = id_map["46777007"]
-c.execute(sql, antro(jid, "2025-07-10", 85, 180, True, 0))
-c.execute(sql, antro(jid, "2025-11-05", 86, 180, True, 0.5))
-c.execute(sql, antro(jid, "2026-03-10", 87, 180, True, 1))
+c.execute(sql, antro(jid, "2025-07-10", 85, 180, "Ala", "M19", True, 0))
+c.execute(sql, antro(jid, "2025-11-05", 86, 180, "Ala", "M19", True, 0.5))
+c.execute(sql, antro(jid, "2026-03-10", 87, 180, "Ala", "M19", True, 1))
 
 # Player 8: Alvarez - 5 measurements
 jid = id_map["47888008"]
-c.execute(sql, antro(jid, "2025-02-15", 102, 185, True, 5))
-c.execute(sql, antro(jid, "2025-05-20", 100, 185, True, 4))
-c.execute(sql, antro(jid, "2025-08-10", 98, 185, True, 3))
-c.execute(sql, antro(jid, "2025-11-25", 96, 185, True, 2))
-c.execute(sql, antro(jid, "2026-03-30", 95, 185, True, 1))
+c.execute(sql, antro(jid, "2025-02-15", 102, 185, "Numero 8", "Plantel Superior", True, 5))
+c.execute(sql, antro(jid, "2025-05-20", 100, 185, "Numero 8", "Plantel Superior", True, 4))
+c.execute(sql, antro(jid, "2025-08-10", 98, 185, "Numero 8", "Plantel Superior", True, 3))
+c.execute(sql, antro(jid, "2025-11-25", 96, 185, "Numero 8", "Plantel Superior", True, 2))
+c.execute(sql, antro(jid, "2026-03-30", 95, 185, "Numero 8", "Plantel Superior", True, 1))
 
 # Player 9: Romero - 2 measurements
 jid = id_map["48999009"]
-c.execute(sql, antro(jid, "2026-01-20", 52, 158, False, 0))
-c.execute(sql, antro(jid, "2026-03-22", 53, 158, False, 0.5))
+c.execute(sql, antro(jid, "2026-01-20", 52, 158, "Medio scrum", "M16", False, 0))
+c.execute(sql, antro(jid, "2026-03-22", 53, 158, "Medio scrum", "M16", False, 0.5))
 
 # Player 10: Torres - 0 measurements (new player, no data yet)
 
