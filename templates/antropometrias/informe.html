@@ -136,6 +136,32 @@
     </div>
 </div>
 
+<!-- Gráficos -->
+{% if graficos.composicion or graficos.pliegues or graficos.perimetros %}
+<div class="card mb-4">
+    <div class="card-header">Gráficos</div>
+    <div class="card-body">
+        <div class="row text-center">
+            {% if graficos.composicion %}
+            <div class="col-md-4">
+                <img src="data:image/png;base64,{{ graficos.composicion }}" class="img-fluid" alt="Composición corporal">
+            </div>
+            {% endif %}
+            {% if graficos.pliegues %}
+            <div class="col-md-4">
+                <img src="data:image/png;base64,{{ graficos.pliegues }}" class="img-fluid" alt="Pliegues cutáneos">
+            </div>
+            {% endif %}
+            {% if graficos.perimetros %}
+            <div class="col-md-4">
+                <img src="data:image/png;base64,{{ graficos.perimetros }}" class="img-fluid" alt="Perímetros">
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <!-- Fórmulas -->
 <div class="card mb-5">
     <div class="card-body text-muted small">

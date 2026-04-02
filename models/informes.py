@@ -219,42 +219,46 @@ def calcular_composicion(jugador, antropometria):
 
 
 def obtener_datos_informe(categoria=None, posicion=None, sexo=None):
-    """Get report data: each player with their last 3 measurements and computed values."""
+    """Get report data: each player with their last 3 matching measurements.
+
+    posicion/categoria filters apply to the anthropometry record (snapshot at
+    measurement time), NOT to the player's current values. This way a player
+    who switched positions still appears when filtering by their old position.
+    sexo filters on the player since it doesn't change.
+    """
     conn = get_connection()
     cursor = conn.cursor()
 
-    query = "SELECT * FROM jugadores WHERE 1=1"
-    params = []
-
-    if categoria:
-        query += " AND LOWER(categoria_actual) = LOWER(?)"
-        params.append(categoria)
-    if posicion:
-        query += " AND LOWER(posicion_actual) = LOWER(?)"
-        params.append(posicion)
+    # Only sexo filters on the player — posicion/categoria filter on measurements
+    jug_query = "SELECT * FROM jugadores WHERE 1=1"
+    jug_params = []
     if sexo:
-        query += " AND sexo = ?"
-        params.append(sexo)
-
-    query += " ORDER BY apellido, nombre"
-    cursor.execute(query, params)
+        jug_query += " AND sexo = ?"
+        jug_params.append(sexo)
+    jug_query += " ORDER BY apellido, nombre"
+    cursor.execute(jug_query, jug_params)
     jugadores = [dict(j) for j in cursor.fetchall()]
 
     resultado = []
     for jugador in jugadores:
-        cursor.execute("""
-            SELECT * FROM antropometrias
-            WHERE jugador_id = ?
-            ORDER BY fecha DESC
-            LIMIT 3
-        """, (jugador["id"],))
+        ant_query = "SELECT * FROM antropometrias WHERE jugador_id = ?"
+        ant_params = [jugador["id"]]
+        if categoria:
+            ant_query += " AND LOWER(categoria) = LOWER(?)"
+            ant_params.append(categoria)
+        if posicion:
+            ant_query += " AND LOWER(posicion) = LOWER(?)"
+            ant_params.append(posicion)
+        ant_query += " ORDER BY fecha DESC LIMIT 3"
+
+        cursor.execute(ant_query, ant_params)
         mediciones = [dict(m) for m in cursor.fetchall()]
 
-        composiciones = []
-        for m in mediciones:
-            comp = calcular_composicion(jugador, m)
-            composiciones.append(comp)
+        # Skip players with no matching measurements
+        if not mediciones:
+            continue
 
+        composiciones = [calcular_composicion(jugador, m) for m in mediciones]
         resultado.append({
             "jugador": jugador,
             "mediciones": composiciones,
