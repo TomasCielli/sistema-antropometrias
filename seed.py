@@ -77,60 +77,73 @@ placeholders = ", ".join(["?"] * 31)
 sql = f"INSERT INTO antropometrias ({campos_antro}) VALUES ({placeholders})"
 
 # Player 1: Gonzalez - 4 measurements
+# Started as Hooker in M19, promoted to Plantel Superior as Pilar
 jid = id_map["40111001"]
-c.execute(sql, antro(jid, "2025-06-15", 92, 182, "Pilar", "Plantel Superior", True, 0))
-c.execute(sql, antro(jid, "2025-09-20", 94, 182, "Pilar", "Plantel Superior", True, 1))
-c.execute(sql, antro(jid, "2026-01-10", 95, 182, "Pilar", "Plantel Superior", True, 2))
-c.execute(sql, antro(jid, "2026-03-28", 96, 182, "Pilar", "Plantel Superior", True, 2.5))
+c.execute(sql, antro(jid, "2025-03-10", 88, 182, "Hooker",  "M19",              True, -1))
+c.execute(sql, antro(jid, "2025-06-15", 92, 182, "Hooker",  "M19",              True,  0))
+c.execute(sql, antro(jid, "2025-11-20", 94, 182, "Pilar",   "Plantel Superior", True,  1))
+c.execute(sql, antro(jid, "2026-03-28", 96, 182, "Pilar",   "Plantel Superior", True,  2))
 
 # Player 2: Rodriguez - 3 measurements
+# Moved up from M18 to M19 mid-season
 jid = id_map["41222002"]
-c.execute(sql, antro(jid, "2025-08-01", 65, 168, "Centro", "M19", False, 0))
-c.execute(sql, antro(jid, "2025-12-15", 64, 168, "Centro", "M19", False, -0.5))
+c.execute(sql, antro(jid, "2025-05-10", 66, 168, "Centro", "M18", False,  0.5))
+c.execute(sql, antro(jid, "2025-09-01", 65, 168, "Centro", "M18", False,  0))
 c.execute(sql, antro(jid, "2026-03-20", 63, 168, "Centro", "M19", False, -1))
 
-# Player 3: Fernandez - 5 measurements (most data)
+# Player 3: Fernandez - 5 measurements
+# Always Hooker, but dropped from Plantel Superior to M19 after injury, then back
 jid = id_map["42333003"]
 c.execute(sql, antro(jid, "2025-03-10", 105, 178, "Hooker", "Plantel Superior", True, 4))
 c.execute(sql, antro(jid, "2025-06-22", 103, 178, "Hooker", "Plantel Superior", True, 3))
-c.execute(sql, antro(jid, "2025-09-15", 101, 178, "Hooker", "Plantel Superior", True, 2))
-c.execute(sql, antro(jid, "2025-12-20", 99, 178, "Hooker", "Plantel Superior", True, 1))
-c.execute(sql, antro(jid, "2026-03-25", 97, 178, "Hooker", "Plantel Superior", True, 0))
+c.execute(sql, antro(jid, "2025-09-15", 101, 178, "Hooker", "M19",              True, 2))
+c.execute(sql, antro(jid, "2025-12-20",  99, 178, "Hooker", "M19",              True, 1))
+c.execute(sql, antro(jid, "2026-03-25",  97, 178, "Hooker", "Plantel Superior", True, 0))
 
-# Player 4: Lopez - 2 measurements
+# Player 4: Lopez - 3 measurements
+# Played Wing in M17, moved to M18 as Centro
 jid = id_map["43444004"]
-c.execute(sql, antro(jid, "2025-10-05", 60, 165, "Wing", "M18", False, 0))
-c.execute(sql, antro(jid, "2026-02-18", 61, 165, "Wing", "M18", False, 0.5))
+c.execute(sql, antro(jid, "2025-05-15", 58, 165, "Wing",   "M17", False, -0.5))
+c.execute(sql, antro(jid, "2025-10-05", 60, 165, "Wing",   "M18", False,  0))
+c.execute(sql, antro(jid, "2026-02-18", 61, 165, "Centro", "M18", False,  0.5))
 
 # Player 5: Martinez - 4 measurements
+# Always Segunda línea, Plantel Superior
 jid = id_map["44555005"]
 c.execute(sql, antro(jid, "2025-04-01", 108, 195, "Segunda línea", "Plantel Superior", True, 3))
 c.execute(sql, antro(jid, "2025-07-15", 110, 195, "Segunda línea", "Plantel Superior", True, 3.5))
 c.execute(sql, antro(jid, "2025-11-20", 111, 195, "Segunda línea", "Plantel Superior", True, 4))
 c.execute(sql, antro(jid, "2026-03-15", 112, 195, "Segunda línea", "Plantel Superior", True, 4.5))
 
-# Player 6: Garcia - 1 measurement
+# Player 6: Garcia - 2 measurements
+# Started as Fullback in M16, moved to M17 as Apertura
 jid = id_map["45666006"]
-c.execute(sql, antro(jid, "2026-03-01", 55, 160, "Apertura", "M17", False, 0))
+c.execute(sql, antro(jid, "2025-08-20", 53, 160, "Fullback", "M16", False, -0.5))
+c.execute(sql, antro(jid, "2026-03-01", 55, 160, "Apertura", "M17", False,  0))
 
-# Player 7: Diaz - 3 measurements
+# Player 7: Diaz - 4 measurements
+# Played Ala in M19, moved to Plantel Superior, also tried Numero 8
 jid = id_map["46777007"]
-c.execute(sql, antro(jid, "2025-07-10", 85, 180, "Ala", "M19", True, 0))
-c.execute(sql, antro(jid, "2025-11-05", 86, 180, "Ala", "M19", True, 0.5))
-c.execute(sql, antro(jid, "2026-03-10", 87, 180, "Ala", "M19", True, 1))
+c.execute(sql, antro(jid, "2025-04-10", 83, 180, "Ala",      "M19",              True, -0.5))
+c.execute(sql, antro(jid, "2025-07-10", 85, 180, "Ala",      "M19",              True,  0))
+c.execute(sql, antro(jid, "2025-11-05", 86, 180, "Numero 8", "Plantel Superior", True,  0.5))
+c.execute(sql, antro(jid, "2026-03-10", 87, 180, "Numero 8", "Plantel Superior", True,  1))
 
 # Player 8: Alvarez - 5 measurements
+# Moved from Ala to Numero 8 after first measurement
 jid = id_map["47888008"]
-c.execute(sql, antro(jid, "2025-02-15", 102, 185, "Numero 8", "Plantel Superior", True, 5))
+c.execute(sql, antro(jid, "2025-02-15", 102, 185, "Ala",      "Plantel Superior", True, 5))
 c.execute(sql, antro(jid, "2025-05-20", 100, 185, "Numero 8", "Plantel Superior", True, 4))
-c.execute(sql, antro(jid, "2025-08-10", 98, 185, "Numero 8", "Plantel Superior", True, 3))
-c.execute(sql, antro(jid, "2025-11-25", 96, 185, "Numero 8", "Plantel Superior", True, 2))
-c.execute(sql, antro(jid, "2026-03-30", 95, 185, "Numero 8", "Plantel Superior", True, 1))
+c.execute(sql, antro(jid, "2025-08-10",  98, 185, "Numero 8", "Plantel Superior", True, 3))
+c.execute(sql, antro(jid, "2025-11-25",  96, 185, "Numero 8", "Plantel Superior", True, 2))
+c.execute(sql, antro(jid, "2026-03-30",  95, 185, "Numero 8", "Plantel Superior", True, 1))
 
-# Player 9: Romero - 2 measurements
+# Player 9: Romero - 3 measurements
+# M15 -> M16, Fullback -> Medio scrum
 jid = id_map["48999009"]
-c.execute(sql, antro(jid, "2026-01-20", 52, 158, "Medio scrum", "M16", False, 0))
-c.execute(sql, antro(jid, "2026-03-22", 53, 158, "Medio scrum", "M16", False, 0.5))
+c.execute(sql, antro(jid, "2025-09-10", 50, 158, "Fullback",   "M15", False, -0.5))
+c.execute(sql, antro(jid, "2026-01-20", 52, 158, "Medio scrum","M16", False,  0))
+c.execute(sql, antro(jid, "2026-03-22", 53, 158, "Medio scrum","M16", False,  0.5))
 
 # Player 10: Torres - 0 measurements (new player, no data yet)
 
@@ -139,5 +152,15 @@ conn.close()
 
 print("Seed completado:")
 print("  10 jugadores creados")
-print("  29 antropometrías cargadas")
+print("  31 antropometrías cargadas")
 print("  Torres (M15) sin mediciones")
+print()
+print("Cambios de posición/categoría incluidos:")
+print("  Gonzalez:  Hooker/M19 -> Pilar/Plantel Superior")
+print("  Rodriguez: Centro/M18 -> Centro/M19")
+print("  Fernandez: Hooker/Plantel Superior -> Hooker/M19 (lesión) -> Hooker/Plantel Superior")
+print("  Lopez:     Wing/M17 -> Wing/M18 -> Centro/M18")
+print("  Garcia:    Fullback/M16 -> Apertura/M17")
+print("  Diaz:      Ala/M19 -> Numero 8/Plantel Superior")
+print("  Alvarez:   Ala/Plantel Superior -> Numero 8/Plantel Superior")
+print("  Romero:    Fullback/M15 -> Medio scrum/M16")
