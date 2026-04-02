@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Nuevo Jugador — Albatros Rugby Club{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Nuevo Jugador</h2>
+    <a href="{{ url_for('jugadores.listar') }}" class="btn btn-outline-secondary">Volver</a>
+</div>
+
+<form method="POST" action="{{ url_for('jugadores.crear') }}">
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label for="apellido" class="form-label">Apellido *</label>
+            <input type="text" class="form-control" id="apellido" name="apellido"
+                   value="{{ jugador.get('apellido', '') }}" required>
+        </div>
+        <div class="col-md-4">
+            <label for="nombre" class="form-label">Nombre *</label>
+            <input type="text" class="form-control" id="nombre" name="nombre"
+                   value="{{ jugador.get('nombre', '') }}" required>
+        </div>
+        <div class="col-md-4">
+            <label for="dni" class="form-label">DNI *</label>
+            <input type="text" class="form-control" id="dni" name="dni"
+                   value="{{ jugador.get('dni', '') }}" required>
+        </div>
+        <div class="col-md-4">
+            <label for="sexo" class="form-label">Sexo *</label>
+            <select class="form-select" id="sexo" name="sexo" required>
+                <option value="">— Sexo —</option>
+                {% for s in sexos %}
+                <option value="{{ s }}" {% if jugador.get('sexo') == s %}selected{% endif %}>{{ s }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label for="fecha_nacimiento" class="form-label">Fecha de nacimiento *</label>
+            <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento"
+                   value="{{ jugador.get('fecha_nacimiento', '') }}" required>
+        </div>
+        <div class="col-md-4">
+            <label for="posicion_actual" class="form-label">Posición</label>
+            <select class="form-select" id="posicion_actual" name="posicion_actual">
+                <option value="">— Posición —</option>
+                {% for p in posiciones %}
+                <option value="{{ p }}" {% if jugador.get('posicion_actual') == p %}selected{% endif %}>{{ p }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label for="categoria_actual" class="form-label">Categoría</label>
+            <select class="form-select" id="categoria_actual" name="categoria_actual">
+                <option value="">— Categoría —</option>
+                {% for c in categorias %}
+                <option value="{{ c }}" {% if jugador.get('categoria_actual') == c %}selected{% endif %}>{{ c }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label for="objetivo" class="form-label">Objetivo</label>
+            <select class="form-select" id="objetivo" name="objetivo">
+                <option value="">— Objetivo —</option>
+                {% for o in objetivos %}
+                <option value="{{ o }}" {% if jugador.get('objetivo') == o %}selected{% endif %}>{{ o }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a href="{{ url_for('jugadores.listar') }}" class="btn btn-outline-secondary ms-2">Cancelar</a>
+    </div>
+</form>
+{% endblock %}

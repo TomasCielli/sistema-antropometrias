@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Antropometrías de {{ jugador.apellido }}, {{ jugador.nombre }} — Albatros Rugby Club{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2>{{ jugador.apellido }}, {{ jugador.nombre }}</h2>
+        <p class="text-muted mb-0">
+            DNI: {{ jugador.dni }} |
+            Posición: {{ jugador.posicion_actual or '—' }} |
+            Categoría: {{ jugador.categoria_actual or '—' }}
+        </p>
+    </div>
+    <div>
+        <a href="{{ url_for('antropometrias.nueva', id=jugador.id) }}" class="btn btn-primary">Nueva medición</a>
+        <a href="{{ url_for('jugadores.listar') }}" class="btn btn-outline-secondary ms-2">Volver</a>
+    </div>
+</div>
+
+{% if antropometrias %}
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Fecha</th>
+                <th>Posición</th>
+                <th>Categoría</th>
+                <th>Peso (kg)</th>
+                <th>Talla (cm)</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in antropometrias %}
+            <tr>
+                <td>{{ a.fecha }}</td>
+                <td>{{ a.posicion or '—' }}</td>
+                <td>{{ a.categoria or '—' }}</td>
+                <td>{{ a.peso if a.peso is not none else '—' }}</td>
+                <td>{{ a.talla_corporal if a.talla_corporal is not none else '—' }}</td>
+                <td class="btn-group-actions">
+                    <a href="{{ url_for('antropometrias.editar', id=a.id) }}"
+                       class="btn btn-sm btn-outline-secondary">Editar</a>
+                    <form method="POST" action="{{ url_for('antropometrias.eliminar', id=a.id) }}"
+                          class="d-inline"
+                          onsubmit="return confirmarEliminar('{{ a.fecha }}', 'medicion')">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-info">
+    Sin mediciones registradas. <a href="{{ url_for('antropometrias.nueva', id=jugador.id) }}">Cargar la primera</a>.
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block title %}Informe General — Albatros Rugby Club{% endblock %}
+{% block content %}
+<h2 class="mb-3">Informe General</h2>
+
+<form method="GET" action="{{ url_for('informes.general') }}" class="row g-2 mb-4">
+    <div class="col-md-3">
+        <select name="categoria" class="form-select">
+            <option value="">Todas las categorías</option>
+            {% for c in categorias %}
+            <option value="{{ c }}" {% if filtro_categoria == c %}selected{% endif %}>{{ c }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-3">
+        <select name="posicion" class="form-select">
+            <option value="">Todas las posiciones</option>
+            {% for p in posiciones %}
+            <option value="{{ p }}" {% if filtro_posicion == p %}selected{% endif %}>{{ p }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-3">
+        <select name="sexo" class="form-select">
+            <option value="">Todos</option>
+            {% for s in sexos %}
+            <option value="{{ s }}" {% if filtro_sexo == s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-3">
+        <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+    </div>
+</form>
+
+{% if datos %}
+{% for item in datos %}
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+            <strong>{{ item.jugador.apellido }}, {{ item.jugador.nombre }}</strong>
+            <span class="text-muted ms-2">
+                {{ item.jugador.posicion_actual or '' }} | {{ item.jugador.categoria_actual or '' }}
+            </span>
+        </div>
+        {% if item.jugador.objetivo %}
+        <span class="badge bg-info">{{ item.jugador.objetivo }}</span>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        {% if item.mediciones %}
+        <div class="table-responsive">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Dato</th>
+                        {% for m in item.mediciones %}
+                        <th class="text-center">{{ m.fecha }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Talla (cm)</td>
+                        {% for m in item.mediciones %}
+                        <td class="text-center">{{ m.talla if m.talla is not none else '—' }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td>Peso (kg)</td>
+                        {% for m in item.mediciones %}
+                        <td class="text-center">{{ m.peso if m.peso is not none else '—' }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td>Σ Pliegues (mm)</td>
+                        {% for m in item.mediciones %}
+                        <td class="text-center">{{ m.suma_pliegues if m.suma_pliegues is not none else '—' }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td>% Grasa</td>
+                        {% for m in item.mediciones %}
+                        <td class="text-center">{{ m.pct_grasa if m.pct_grasa is not none else '—' }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td>Kg Grasa</td>
+                        {% for m in item.mediciones %}
+                        <td class="text-center">{{ m.kg_grasa if m.kg_grasa is not none else '—' }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td>Masa Muscular (kg)</td>
+                        {% for m in item.mediciones %}
+                        <td class="text-center">{{ m.masa_muscular if m.masa_muscular is not none else '—' }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td>Masa Ósea (kg)</td>
+                        {% for m in item.mediciones %}
+                        <td class="text-center">{{ m.masa_osea if m.masa_osea is not none else '—' }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td>Masa Magra (kg)</td>
+                        {% for m in item.mediciones %}
+                        <td class="text-center">{{ m.masa_magra if m.masa_magra is not none else '—' }}</td>
+                        {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">Sin mediciones registradas.</p>
+        {% endif %}
+    </div>
+</div>
+{% endfor %}
+{% else %}
+<div class="alert alert-info">
+    No se encontraron jugadores con los filtros seleccionados.
+</div>
+{% endif %}
+
+<div class="card mt-4 mb-5">
+    <div class="card-body text-muted small">
+        <strong>Fórmulas utilizadas:</strong>
+        <ul class="mb-0">
+            <li><strong>% Grasa</strong> — Yuhasz modificada: Masc: (Σ6 × 0.1051) + 2.585 | Fem: (Σ6 × 0.1580) + 3.580</li>
+            <li><strong>Masa Muscular</strong> — Lee (2000)</li>
+            <li><strong>Masa Ósea</strong> — Von Döbeln-Rocha</li>
+            <li><strong>Masa Magra</strong> — Peso - Kg Grasa</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
