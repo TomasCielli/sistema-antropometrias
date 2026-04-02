@@ -12,7 +12,8 @@ datos_bp = Blueprint("datos", __name__)
 
 # Jugador fields to compare for conflict detection
 CAMPOS_JUGADOR = ["nombre", "apellido", "sexo", "posicion_actual",
-                  "categoria_actual", "fecha_nacimiento", "objetivo"]
+                  "categoria_actual", "fecha_nacimiento", "objetivo",
+                  "telefono", "observaciones"]
 
 LABELS_JUGADOR = {
     "nombre": "Nombre",
@@ -22,6 +23,8 @@ LABELS_JUGADOR = {
     "categoria_actual": "Categoría actual",
     "fecha_nacimiento": "Fecha de nacimiento",
     "objetivo": "Objetivo",
+    "telefono": "Teléfono",
+    "observaciones": "Observaciones",
 }
 
 
@@ -44,7 +47,8 @@ def exportar():
     ws_jug.title = "Jugadores"
     jug_headers = ["id", "apellido", "nombre", "dni", "sexo",
                    "posicion_actual", "categoria_actual",
-                   "fecha_nacimiento", "objetivo", "creado_en"]
+                   "fecha_nacimiento", "objetivo", "telefono",
+                   "observaciones", "creado_en"]
     ws_jug.append(jug_headers)
 
     cursor.execute("SELECT * FROM jugadores ORDER BY apellido, nombre")
@@ -170,6 +174,8 @@ def procesar_importacion():
             "posicion_actual": _normalizar(datos.get("posicion_actual")) or None,
             "categoria_actual": _normalizar(datos.get("categoria_actual")) or None,
             "objetivo": _normalizar(datos.get("objetivo")) or None,
+            "telefono": _normalizar(datos.get("telefono")) or None,
+            "observaciones": _normalizar(datos.get("observaciones")) or None,
         }
 
         # Check if DNI exists in DB
@@ -336,11 +342,13 @@ def _procesar_datos(nuevos, decisiones, antropometrias_pendientes):
         try:
             cursor.execute("""
                 INSERT INTO jugadores (nombre, apellido, dni, sexo, posicion_actual,
-                                       categoria_actual, fecha_nacimiento, objetivo)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                                       categoria_actual, fecha_nacimiento, objetivo,
+                                       telefono, observaciones)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (j["nombre"], j["apellido"], j["dni"], j["sexo"],
                   j.get("posicion_actual"), j.get("categoria_actual"),
-                  j["fecha_nacimiento"], j.get("objetivo")))
+                  j["fecha_nacimiento"], j.get("objetivo"),
+                  j.get("telefono"), j.get("observaciones")))
             jug_insertados += 1
         except Exception:
             jug_omitidos += 1

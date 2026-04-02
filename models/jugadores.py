@@ -6,14 +6,14 @@ SEXOS = ["Masculino", "Femenino"]
 OBJETIVOS = ["Optimización", "Aumento de masa muscular", "Descenso de grasa"]
 
 
-def crear_jugador(nombre, apellido, dni, sexo, fecha_nacimiento, posicion=None, categoria=None, objetivo=None):
+def crear_jugador(nombre, apellido, dni, sexo, fecha_nacimiento, posicion=None, categoria=None, objetivo=None, telefono=None, observaciones=None):
     conn = get_connection()
     cursor = conn.cursor()
     try:
         cursor.execute("""
-            INSERT INTO jugadores (nombre, apellido, dni, sexo, fecha_nacimiento, posicion_actual, categoria_actual, objetivo)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """, (nombre.strip(), apellido.strip(), dni.strip(), sexo, fecha_nacimiento, posicion, categoria, objetivo))
+            INSERT INTO jugadores (nombre, apellido, dni, sexo, fecha_nacimiento, posicion_actual, categoria_actual, objetivo, telefono, observaciones)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (nombre.strip(), apellido.strip(), dni.strip(), sexo, fecha_nacimiento, posicion, categoria, objetivo, telefono, observaciones))
         conn.commit()
     except Exception as e:
         conn.close()

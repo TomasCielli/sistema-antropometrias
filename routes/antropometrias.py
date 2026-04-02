@@ -100,6 +100,19 @@ def crear(id):
                                posiciones=POSICIONES)
 
 
+@antropometrias_bp.route("/antropometrias/<int:id>/ver")
+def ver(id):
+    antropometria = obtener_antropometria_por_id(id)
+    if not antropometria:
+        abort(404)
+    jugador = obtener_jugador_por_id(antropometria["jugador_id"])
+    return render_template("antropometrias/ver.html",
+                           jugador=jugador,
+                           antropometria=antropometria,
+                           secciones=SECCIONES,
+                           labels=LABELS)
+
+
 @antropometrias_bp.route("/antropometrias/<int:id>/editar", methods=["GET"])
 def editar(id):
     antropometria = obtener_antropometria_por_id(id)
@@ -188,3 +201,20 @@ def eliminar(id):
         return redirect(url_for("antropometrias.historial", id=jugador_id))
     except ValueError:
         abort(404)
+
+
+@antropometrias_bp.route("/jugadores/<int:id>/antropometrias/eliminar_masivo", methods=["POST"])
+def eliminar_masivo(id):
+    ids = request.form.getlist("seleccionados")
+    if not ids:
+        flash("No se seleccionó ninguna medición", "warning")
+        return redirect(url_for("antropometrias.historial", id=id))
+    eliminados = 0
+    for aid in ids:
+        try:
+            eliminar_antropometria(int(aid))
+            eliminados += 1
+        except (ValueError, TypeError):
+            pass
+    flash(f"{eliminados} medición(es) eliminada(s)", "success")
+    return redirect(url_for("antropometrias.historial", id=id))

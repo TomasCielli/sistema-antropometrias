@@ -38,6 +38,8 @@ def crear():
     posicion = request.form.get("posicion_actual") or None
     categoria = request.form.get("categoria_actual") or None
     objetivo = request.form.get("objetivo") or None
+    telefono = request.form.get("telefono", "").strip() or None
+    observaciones = request.form.get("observaciones", "").strip() or None
 
     errores = []
     if not nombre:
@@ -58,7 +60,7 @@ def crear():
             "nombre": nombre, "apellido": apellido, "dni": dni,
             "sexo": sexo, "fecha_nacimiento": fecha_nacimiento,
             "posicion_actual": posicion, "categoria_actual": categoria,
-            "objetivo": objetivo
+            "objetivo": objetivo, "telefono": telefono, "observaciones": observaciones
         }
         return render_template("jugadores/nuevo.html",
                                categorias=CATEGORIAS,
@@ -68,7 +70,7 @@ def crear():
                                jugador=jugador)
 
     try:
-        crear_jugador(nombre, apellido, dni, sexo, fecha_nacimiento, posicion, categoria, objetivo)
+        crear_jugador(nombre, apellido, dni, sexo, fecha_nacimiento, posicion, categoria, objetivo, telefono, observaciones)
         flash("Jugador creado correctamente", "success")
         return redirect(url_for("jugadores.listar"))
     except sqlite3.IntegrityError:
@@ -77,7 +79,7 @@ def crear():
             "nombre": nombre, "apellido": apellido, "dni": dni,
             "sexo": sexo, "fecha_nacimiento": fecha_nacimiento,
             "posicion_actual": posicion, "categoria_actual": categoria,
-            "objetivo": objetivo
+            "objetivo": objetivo, "telefono": telefono, "observaciones": observaciones
         }
         return render_template("jugadores/nuevo.html",
                                categorias=CATEGORIAS,
@@ -114,6 +116,8 @@ def actualizar(id):
     posicion = request.form.get("posicion_actual") or None
     categoria = request.form.get("categoria_actual") or None
     objetivo = request.form.get("objetivo") or None
+    telefono = request.form.get("telefono", "").strip() or None
+    observaciones = request.form.get("observaciones", "").strip() or None
 
     errores = []
     if not nombre:
@@ -134,7 +138,7 @@ def actualizar(id):
             "id": id, "nombre": nombre, "apellido": apellido, "dni": dni,
             "sexo": sexo, "fecha_nacimiento": fecha_nacimiento,
             "posicion_actual": posicion, "categoria_actual": categoria,
-            "objetivo": objetivo
+            "objetivo": objetivo, "telefono": telefono, "observaciones": observaciones
         }
         return render_template("jugadores/editar.html",
                                categorias=CATEGORIAS,
@@ -147,7 +151,7 @@ def actualizar(id):
         "nombre": nombre, "apellido": apellido, "dni": dni,
         "sexo": sexo, "fecha_nacimiento": fecha_nacimiento,
         "posicion_actual": posicion, "categoria_actual": categoria,
-        "objetivo": objetivo
+        "objetivo": objetivo, "telefono": telefono, "observaciones": observaciones
     }
 
     try:
@@ -172,4 +176,21 @@ def eliminar(id):
         flash("Jugador eliminado", "success")
     except ValueError:
         abort(404)
+    return redirect(url_for("jugadores.listar"))
+
+
+@jugadores_bp.route("/jugadores/eliminar_masivo", methods=["POST"])
+def eliminar_masivo():
+    ids = request.form.getlist("seleccionados")
+    if not ids:
+        flash("No se seleccionó ningún jugador", "warning")
+        return redirect(url_for("jugadores.listar"))
+    eliminados = 0
+    for jid in ids:
+        try:
+            eliminar_jugador(int(jid))
+            eliminados += 1
+        except (ValueError, TypeError):
+            pass
+    flash(f"{eliminados} jugador(es) eliminado(s)", "success")
     return redirect(url_for("jugadores.listar"))

@@ -22,6 +22,8 @@ def crear_base():
         categoria_actual TEXT,
         fecha_nacimiento DATE NOT NULL,
         objetivo TEXT,
+        telefono TEXT,
+        observaciones TEXT,
         creado_en DATE DEFAULT CURRENT_TIMESTAMP
     )
     """)
@@ -63,6 +65,16 @@ def crear_base():
         FOREIGN KEY (jugador_id) REFERENCES jugadores(id) ON DELETE CASCADE
     )
     """)
+
+    # Add new columns if they don't exist (migration for existing DBs)
+    try:
+        cursor.execute("ALTER TABLE jugadores ADD COLUMN telefono TEXT")
+    except sqlite3.OperationalError:
+        pass  # Column already exists
+    try:
+        cursor.execute("ALTER TABLE jugadores ADD COLUMN observaciones TEXT")
+    except sqlite3.OperationalError:
+        pass  # Column already exists
 
     cursor.execute("""
     CREATE INDEX IF NOT EXISTS idx_dni ON jugadores (dni)

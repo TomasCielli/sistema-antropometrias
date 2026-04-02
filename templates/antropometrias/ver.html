@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Medición {{ antropometria.fecha }} — {{ jugador.apellido }}, {{ jugador.nombre }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2>Medición del {{ antropometria.fecha }}</h2>
+        <p class="text-muted mb-0">{{ jugador.apellido }}, {{ jugador.nombre }} — DNI: {{ jugador.dni }}</p>
+    </div>
+    <div>
+        <a href="{{ url_for('antropometrias.editar', id=antropometria.id) }}" class="btn btn-outline-secondary">Editar</a>
+        <a href="{{ url_for('antropometrias.historial', id=jugador.id) }}" class="btn btn-outline-secondary ms-2">Volver</a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <strong>Fecha:</strong> {{ antropometria.fecha }}
+    </div>
+    <div class="col-md-4">
+        <strong>Posición:</strong> {{ antropometria.posicion or '—' }}
+    </div>
+    <div class="col-md-4">
+        <strong>Categoría:</strong> {{ antropometria.categoria or '—' }}
+    </div>
+</div>
+
+{% for seccion_nombre, campos in secciones %}
+<div class="card mb-4">
+    <div class="card-header">{{ seccion_nombre }}</div>
+    <div class="card-body">
+        <div class="row g-3">
+            {% for campo in campos %}
+            <div class="col-md-4">
+                <strong>{{ labels[campo][0] }}:</strong>
+                {% if antropometria.get(campo) is not none %}
+                    {{ antropometria[campo] }} {{ labels[campo][1] }}
+                {% else %}
+                    <span class="text-muted">—</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<div class="mb-5">
+    <a href="{{ url_for('antropometrias.historial', id=jugador.id) }}" class="btn btn-outline-secondary">Volver al historial</a>
+</div>
+{% endblock %}
