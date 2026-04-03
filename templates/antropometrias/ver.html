@@ -7,7 +7,8 @@
         <p class="text-muted mb-0">{{ jugador.apellido }}, {{ jugador.nombre }} — DNI: {{ jugador.dni }}</p>
     </div>
     <div>
-        <a href="{{ url_for('antropometrias.editar', id=antropometria.id) }}" class="btn btn-outline-secondary">Editar</a>
+        <a href="{{ url_for('antropometrias.informe', id=antropometria.id) }}" class="btn btn-success">Informe</a>
+        <a href="{{ url_for('antropometrias.editar', id=antropometria.id) }}" class="btn btn-outline-secondary ms-2">Editar</a>
         <a href="{{ url_for('antropometrias.historial', id=jugador.id) }}" class="btn btn-outline-secondary ms-2">Volver</a>
     </div>
 </div>

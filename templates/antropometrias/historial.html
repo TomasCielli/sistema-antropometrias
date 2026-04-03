@@ -50,6 +50,8 @@
                     <td class="btn-group-actions">
                         <a href="{{ url_for('antropometrias.ver', id=a.id) }}"
                            class="btn btn-sm btn-outline-info">Ver</a>
+                        <a href="{{ url_for('antropometrias.informe', id=a.id) }}"
+                           class="btn btn-sm btn-outline-success">Informe</a>
                         <a href="{{ url_for('antropometrias.editar', id=a.id) }}"
                            class="btn btn-sm btn-outline-secondary">Editar</a>
                         <form method="POST" action="{{ url_for('antropometrias.eliminar', id=a.id) }}"

@@ -1,2 +1,4 @@
 flask
 openpyxl
+xhtml2pdf
+matplotlib

@@ -1,10 +1,14 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
+import io
+from datetime import date
+from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, send_file
 from models.antropometrias import (
     CAMPOS_NUMERICOS, LABELS, SECCIONES,
     crear_antropometria, modificar_antropometria, eliminar_antropometria,
     obtener_antropometria_por_id, obtener_antropometrias_de_jugador
 )
 from models.jugadores import CATEGORIAS, POSICIONES, obtener_jugador_por_id
+from models.informes import calcular_composicion_completa, calcular_edad
+from models.graficos import grafico_composicion_pie, grafico_pliegues_bar, grafico_perimetros_bar
 
 antropometrias_bp = Blueprint("antropometrias", __name__)
 
@@ -25,8 +29,8 @@ def nueva(id):
     jugador = obtener_jugador_por_id(id)
     if not jugador:
         abort(404)
-    # Pre-fill with player's current posicion and categoria
     antropometria = {
+        "fecha": date.today().isoformat(),
         "posicion": jugador.get("posicion_actual", ""),
         "categoria": jugador.get("categoria_actual", ""),
     }
@@ -111,6 +115,74 @@ def ver(id):
                            antropometria=antropometria,
                            secciones=SECCIONES,
                            labels=LABELS)
+
+
+def _preparar_informe(id):
+    """Shared logic for informe HTML and PDF."""
+    antropometria = obtener_antropometria_por_id(id)
+    if not antropometria:
+        return None, None, None, None, None
+    jugador = obtener_jugador_por_id(antropometria["jugador_id"])
+    edad = calcular_edad(jugador.get("fecha_nacimiento"), antropometria.get("fecha"))
+    comp = calcular_composicion_completa(jugador, antropometria)
+    graficos = {
+        "composicion": grafico_composicion_pie(comp),
+        "pliegues": grafico_pliegues_bar(antropometria, LABELS),
+        "perimetros": grafico_perimetros_bar(antropometria, LABELS),
+    }
+    return antropometria, jugador, edad, comp, graficos
+
+
+@antropometrias_bp.route("/antropometrias/<int:id>/informe")
+def informe(id):
+    antropometria, jugador, edad, comp, graficos = _preparar_informe(id)
+    if not antropometria:
+        abort(404)
+    return render_template("antropometrias/informe.html",
+                           jugador=jugador,
+                           antropometria=antropometria,
+                           edad=edad,
+                           comp=comp,
+                           graficos=graficos,
+                           secciones=SECCIONES,
+                           labels=LABELS)
+
+
+@antropometrias_bp.route("/antropometrias/<int:id>/informe/pdf")
+def informe_pdf(id):
+    import base64
+    import os
+    from xhtml2pdf import pisa
+
+    antropometria, jugador, edad, comp, graficos = _preparar_informe(id)
+    if not antropometria:
+        abort(404)
+
+    # Embed logo as base64
+    logo_b64 = None
+    logo_path = os.path.join(os.path.dirname(__file__), "..", "static", "img", "logo.png")
+    logo_path = os.path.normpath(logo_path)
+    if os.path.exists(logo_path):
+        with open(logo_path, "rb") as f:
+            logo_b64 = base64.b64encode(f.read()).decode("utf-8")
+
+    html = render_template("antropometrias/informe_pdf.html",
+                           jugador=jugador,
+                           antropometria=antropometria,
+                           edad=edad,
+                           comp=comp,
+                           graficos=graficos,
+                           logo_b64=logo_b64,
+                           secciones=SECCIONES,
+                           labels=LABELS)
+
+    result = io.BytesIO()
+    pisa.CreatePDF(io.StringIO(html), dest=result)
+    result.seek(0)
+
+    filename = f"informe_{jugador['apellido']}_{jugador['nombre']}_{antropometria['fecha']}.pdf"
+    return send_file(result, mimetype="application/pdf",
+                     as_attachment=True, download_name=filename)
 
 
 @antropometrias_bp.route("/antropometrias/<int:id>/editar", methods=["GET"])

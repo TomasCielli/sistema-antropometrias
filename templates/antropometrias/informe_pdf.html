@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        /* Page setup */
+        @page {
+            size: A4;
+            margin: 18mm 15mm 22mm 15mm;
+            @frame footer {
+                -pdf-frame-content: footer-content;
+                bottom: 0mm;
+                margin-left: 0mm;
+                margin-right: 0mm;
+                height: 10mm;
+            }
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 10px;
+            color: #2c2c2c;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Header */
+        .header {
+            overflow: hidden;
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 6px;
+            margin-bottom: 10px;
+        }
+        .header-logo {
+            float: left;
+            width: 50px;
+        }
+        .header-logo img {
+            width: 46px;
+            height: 46px;
+        }
+        .header-text {
+            float: left;
+            margin-left: 10px;
+        }
+        .header-text h1 {
+            font-size: 15px;
+            margin: 0 0 2px 0;
+            color: #2c3e50;
+        }
+        .header-text p {
+            font-size: 9px;
+            color: #666;
+            margin: 0;
+        }
+        .header-fecha {
+            float: right;
+            text-align: right;
+            font-size: 9px;
+            color: #666;
+            padding-top: 4px;
+        }
+
+        /* Section headings */
+        h2 {
+            font-size: 10px;
+            background: #2c3e50;
+            color: white;
+            padding: 4px 8px;
+            margin: 10px 0 5px 0;
+        }
+        h3 {
+            font-size: 9px;
+            color: #555;
+            margin: 6px 0 3px 0;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 2px;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 6px;
+            table-layout: fixed;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 3px 5px;
+            font-size: 9px;
+            word-wrap: break-word;
+            overflow: hidden;
+        }
+        th {
+            background: #ecf0f1;
+            font-weight: bold;
+            text-align: left;
+        }
+        td { text-align: center; }
+        td.label-cell { text-align: left; }
+        .highlight { background: #d5f5e3; }
+        .warning { background: #fdebd0; }
+
+        /* Player info row */
+        .info-row {
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+        .info-col {
+            float: left;
+            width: 33%;
+            font-size: 9px;
+            padding: 1px 0;
+        }
+        .info-col.half { width: 50%; }
+        .info-label { color: #777; }
+        .info-value { font-weight: bold; }
+
+        /* Charts */
+        .charts-row { overflow: hidden; margin-bottom: 6px; }
+        .chart-col { float: left; width: 33%; text-align: center; padding: 0 3px; }
+        .chart-col img { width: 100%; max-width: 160px; }
+
+        /* Footer */
+        #footer-content {
+            text-align: center;
+            font-size: 7px;
+            color: #bbb;
+            border-top: 1px solid #e0e0e0;
+            padding-top: 3px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Footer (rendered by @frame) -->
+<div id="footer-content">
+    Software Tomas Cielli &nbsp;·&nbsp; Albatros Rugby Club &nbsp;·&nbsp; Informe generado el {{ antropometria.fecha }}
+</div>
+
+<!-- Header -->
+<div class="header">
+    <div class="header-logo">
+        {% if logo_b64 %}
+        <img src="data:image/png;base64,{{ logo_b64 }}" alt="Logo">
+        {% endif %}
+    </div>
+    <div class="header-text">
+        <h1>Informe Antropométrico</h1>
+        <p>Albatros Rugby Club — La Plata</p>
+    </div>
+    <div class="header-fecha">
+        Fecha de medición: <strong>{{ antropometria.fecha }}</strong>
+    </div>
+</div>
+
+<!-- Datos del jugador -->
+<h2>Datos del Jugador</h2>
+<div class="info-row">
+    <div class="info-col"><span class="info-label">Apellido y nombre: </span><span class="info-value">{{ jugador.apellido }}, {{ jugador.nombre }}</span></div>
+    <div class="info-col"><span class="info-label">DNI: </span><span class="info-value">{{ jugador.dni }}</span></div>
+    <div class="info-col"><span class="info-label">Sexo: </span><span class="info-value">{{ jugador.sexo }}</span></div>
+</div>
+<div class="info-row">
+    <div class="info-col"><span class="info-label">Edad: </span><span class="info-value">{{ edad if edad is not none else '—' }} años</span></div>
+    <div class="info-col"><span class="info-label">Posición: </span><span class="info-value">{{ antropometria.posicion or '—' }}</span></div>
+    <div class="info-col"><span class="info-label">Categoría: </span><span class="info-value">{{ antropometria.categoria or '—' }}</span></div>
+</div>
+{% if jugador.objetivo %}
+<div class="info-row">
+    <div class="info-col half"><span class="info-label">Objetivo: </span><span class="info-value">{{ jugador.objetivo }}</span></div>
+    {% if jugador.telefono %}<div class="info-col half"><span class="info-label">Teléfono: </span><span class="info-value">{{ jugador.telefono }}</span></div>{% endif %}
+</div>
+{% endif %}
+{% if jugador.observaciones %}
+<div class="info-row">
+    <div class="info-col" style="width:100%"><span class="info-label">Observaciones: </span>{{ jugador.observaciones }}</div>
+</div>
+{% endif %}
+
+<!-- Mediciones -->
+<h2>Mediciones Antropométricas</h2>
+{% for seccion_nombre, campos in secciones %}
+<h3>{{ seccion_nombre }}</h3>
+<table>
+    <tr>
+        {% for campo in campos %}
+        <th style="width:{{ (100 / campos|length)|round|int }}%">{{ labels[campo][0] }}</th>
+        {% endfor %}
+    </tr>
+    <tr>
+        {% for campo in campos %}
+        <td>{% if antropometria.get(campo) is not none %}{{ antropometria[campo] }} {{ labels[campo][1] }}{% else %}—{% endif %}</td>
+        {% endfor %}
+    </tr>
+</table>
+{% endfor %}
+
+<!-- Composición Corporal -->
+<h2>Composición Corporal — Fraccionamiento en 5 Componentes</h2>
+
+<div class="info-row" style="margin-bottom:6px">
+    <div class="info-col"><span class="info-label">Superficie Corporal: </span><strong>{{ comp.superficie_corporal if comp.superficie_corporal is not none else '—' }} m²</strong></div>
+    <div class="info-col"><span class="info-label">Σ 6 pliegues: </span><strong>{{ comp.suma_6_pliegues if comp.suma_6_pliegues is not none else '—' }} mm</strong></div>
+    <div class="info-col"><span class="info-label">Σ 8 pliegues: </span><strong>{{ comp.suma_8_pliegues if comp.suma_8_pliegues is not none else '—' }} mm</strong></div>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th style="width:52%">Componente</th>
+            <th style="width:24%">Masa (kg)</th>
+            <th style="width:24%">% del Peso</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="label-cell">Masa Adiposa <small>(ISAK / Ross &amp; Kerr)</small></td>
+            <td>{{ comp.masa_adiposa if comp.masa_adiposa is not none else '—' }}</td>
+            <td>{{ comp.pct_grasa if comp.pct_grasa is not none else '—' }}%</td>
+        </tr>
+        <tr>
+            <td class="label-cell">Masa Muscular <small>(Lee adaptada ISAK)</small></td>
+            <td>{{ comp.masa_muscular if comp.masa_muscular is not none else '—' }}</td>
+            <td>{{ comp.pct_muscular if comp.pct_muscular is not none else '—' }}%</td>
+        </tr>
+        <tr>
+            <td class="label-cell">Masa Ósea <small>(Rocha)</small></td>
+            <td>{{ comp.masa_osea if comp.masa_osea is not none else '—' }}</td>
+            <td>{{ comp.pct_osea if comp.pct_osea is not none else '—' }}%</td>
+        </tr>
+        <tr>
+            <td class="label-cell">Masa Residual <small>(derivada)</small></td>
+            <td>{{ comp.masa_residual if comp.masa_residual is not none else '—' }}</td>
+            <td>{{ comp.pct_residual if comp.pct_residual is not none else '—' }}%</td>
+        </tr>
+        <tr>
+            <td class="label-cell">Masa de Piel</td>
+            <td>{{ comp.masa_piel if comp.masa_piel is not none else '—' }}</td>
+            <td>{{ comp.pct_piel if comp.pct_piel is not none else '—' }}%</td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr class="highlight">
+            <th class="label-cell">Total</th>
+            <th>{{ antropometria.peso if antropometria.peso is not none else '—' }} kg</th>
+            <th>100%</th>
+        </tr>
+        {% if comp.desviacion_residual is not none %}
+        <tr class="{{ 'warning' if comp.desviacion_residual|abs > 3 else 'highlight' }}">
+            <td class="label-cell"><strong>Calidad del modelo</strong> <small>(residual esperado: {{ comp.residual_esperado }} kg)</small></td>
+            <td>{{ comp.desviacion_residual }} kg</td>
+            <td>{% if comp.desviacion_residual|abs > 3 %}⚠ Revisar{% else %}OK{% endif %}</td>
+        </tr>
+        {% endif %}
+    </tfoot>
+</table>
+
+<!-- Gráficos -->
+{% if graficos.composicion or graficos.pliegues or graficos.perimetros %}
+<h2>Gráficos</h2>
+<div class="charts-row">
+    {% if graficos.composicion %}
+    <div class="chart-col">
+        <img src="data:image/png;base64,{{ graficos.composicion }}" alt="Composición">
+    </div>
+    {% endif %}
+    {% if graficos.pliegues %}
+    <div class="chart-col">
+        <img src="data:image/png;base64,{{ graficos.pliegues }}" alt="Pliegues">
+    </div>
+    {% endif %}
+    {% if graficos.perimetros %}
+    <div class="chart-col">
+        <img src="data:image/png;base64,{{ graficos.perimetros }}" alt="Perímetros">
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- Fórmulas -->
+<div style="margin-top:8px; font-size:7.5px; color:#999; border-top:1px solid #eee; padding-top:5px;">
+    <strong>Fórmulas:</strong>
+    SC: Du Bois &nbsp;|&nbsp;
+    Adiposa: ISAK/Ross &amp; Kerr: (Σ6×0.1051)×SC &nbsp;|&nbsp;
+    Muscular: Lee ISAK (perímetros corregidos, caucásico) &nbsp;|&nbsp;
+    Ósea: Rocha &nbsp;|&nbsp;
+    Residual: derivada (Peso − otras 4) &nbsp;|&nbsp;
+    Piel: SC×1.05
+</div>
+
+</body>
+</html>
