@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Medición {{ antropometria.fecha }} — {{ jugador.apellido }}, {{ jugador.nombre }}{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
+<div class="d-flex justify-content-between align-items-center mb-3" data-reveal>
     <div>
         <h2>Medición del {{ antropometria.fecha }}</h2>
         <p class="text-muted mb-0">{{ jugador.apellido }}, {{ jugador.nombre }} — DNI: {{ jugador.dni }}</p>
@@ -12,7 +12,7 @@
     </div>
 </div>
 
-<div class="row g-3 mb-4">
+<div class="row g-3 mb-4 surface-card" data-reveal>
     <div class="col-md-4">
         <strong>Fecha:</strong> {{ antropometria.fecha }}
     </div>
@@ -25,7 +25,7 @@
 </div>
 
 {% for seccion_nombre, campos in secciones %}
-<div class="card mb-4">
+<div class="card mb-4" data-reveal>
     <div class="card-header">{{ seccion_nombre }}</div>
     <div class="card-body">
         <div class="row g-3">
@@ -44,7 +44,7 @@
 </div>
 {% endfor %}
 
-<div class="mb-5">
+<div class="mb-5" data-reveal>
     <a href="{{ url_for('antropometrias.historial', id=jugador.id) }}" class="btn btn-outline-secondary">Volver al historial</a>
 </div>
 {% endblock %}

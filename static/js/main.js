@@ -1,6 +1,45 @@
 // Client-side search and filter functionality
 
 document.addEventListener("DOMContentLoaded", function () {
+    const header = document.querySelector(".app-header");
+    const revealItems = document.querySelectorAll("[data-reveal]");
+
+    if (header) {
+        function syncHeaderState() {
+            if (window.scrollY > 16) {
+                header.classList.add("compact");
+            } else {
+                header.classList.remove("compact");
+            }
+        }
+
+        syncHeaderState();
+        window.addEventListener("scroll", syncHeaderState, { passive: true });
+    }
+
+    if (revealItems.length) {
+        const observer = new IntersectionObserver(
+            function (entries) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("revealed");
+                        observer.unobserve(entry.target);
+                    }
+                });
+            },
+            { threshold: 0.08 }
+        );
+
+        revealItems.forEach(function (item, index) {
+            item.style.transitionDelay = Math.min(index * 55, 280) + "ms";
+            observer.observe(item);
+        });
+    }
+
+    document.querySelectorAll(".table").forEach(function (table) {
+        table.classList.add("table-modern");
+    });
+
     const searchInput = document.getElementById("search-input");
     const filterCategoria = document.getElementById("filter-categoria");
     const filterSexo = document.getElementById("filter-sexo");

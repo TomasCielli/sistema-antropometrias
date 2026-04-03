@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Informe General — Albatros Rugby Club{% endblock %}
 {% block content %}
-<h2 class="mb-3">Informe General</h2>
+<h2 class="mb-3" data-reveal>Informe General</h2>
 
-<form method="GET" action="{{ url_for('informes.general') }}" class="row g-2 mb-4">
+<form method="GET" action="{{ url_for('informes.general') }}" class="row g-2 mb-4 surface-card" data-reveal>
     <div class="col-md-3">
         <select name="categoria" class="form-select">
             <option value="">Todas las categorías</option>
@@ -35,7 +35,7 @@
 
 {% if datos %}
 {% for item in datos %}
-<div class="card mb-4">
+<div class="card mb-4" data-reveal>
     <div class="card-header d-flex justify-content-between align-items-center">
         <div>
             <strong>{{ item.jugador.apellido }}, {{ item.jugador.nombre }}</strong>
@@ -118,12 +118,12 @@
 </div>
 {% endfor %}
 {% else %}
-<div class="alert alert-info">
+<div class="empty-state" data-reveal>
     No se encontraron jugadores con los filtros seleccionados.
 </div>
 {% endif %}
 
-<div class="card mt-4 mb-5">
+<div class="card mt-4 mb-5" data-reveal>
     <div class="card-body text-muted small">
         <strong>Fórmulas utilizadas:</strong>
         <ul class="mb-0">

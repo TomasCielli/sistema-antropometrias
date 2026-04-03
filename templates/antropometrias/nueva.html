@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Nueva Medición — {{ jugador.apellido }}, {{ jugador.nombre }}{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
+<div class="d-flex justify-content-between align-items-center mb-3" data-reveal>
     <div>
         <h2>Nueva Medición</h2>
         <p class="text-muted mb-0">{{ jugador.apellido }}, {{ jugador.nombre }} — DNI: {{ jugador.dni }}</p>
@@ -10,7 +10,7 @@
 </div>
 
 <form method="POST" action="{{ url_for('antropometrias.crear', id=jugador.id) }}">
-    <div class="row g-3 mb-4">
+    <div class="row g-3 mb-4 surface-card" data-reveal>
         <div class="col-md-4">
             <label for="fecha" class="form-label">Fecha *</label>
             <input type="date" class="form-control" id="fecha" name="fecha"
@@ -37,7 +37,7 @@
     </div>
 
     {% for seccion_nombre, campos in secciones %}
-    <div class="card mb-4">
+    <div class="card mb-4" data-reveal>
         <div class="card-header">{{ seccion_nombre }}</div>
         <div class="card-body">
             <div class="row g-3">
@@ -55,7 +55,7 @@
     </div>
     {% endfor %}
 
-    <div class="mt-3 mb-5">
+    <div class="mt-3 mb-5" data-reveal>
         <button type="submit" class="btn btn-primary">Guardar medición</button>
         <a href="{{ url_for('antropometrias.historial', id=jugador.id) }}" class="btn btn-outline-secondary ms-2">Cancelar</a>
     </div>

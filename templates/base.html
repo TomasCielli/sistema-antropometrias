@@ -4,47 +4,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Albatros Rugby Club — Antropometrías{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('jugadores.listar') }}">
+    {% set endpoint = request.endpoint or '' %}
+    <div class="bg-orb bg-orb-a"></div>
+    <div class="bg-orb bg-orb-b"></div>
+
+    <header class="app-header">
+        <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+            <div class="container-fluid px-3 px-lg-4">
+                <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('index') }}">
                 <img src="{{ url_for('static', filename='img/logo.png') }}"
                      alt="Albatros Rugby Club"
                      height="40"
                      style="object-fit: contain;">
-                Albatros Rugby Club
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('jugadores.listar') }}">Jugadores</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('informes.general') }}">Informe General</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('datos.exportar') }}">Exportar</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('datos.importar') }}">Importar</a>
-                    </li>
-                </ul>
+                    <span class="brand-copy">
+                        <strong>Albatros Rugby Club</strong>
+                        <small>Gestión antropométrica</small>
+                    </span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+                        <li class="nav-item">
+                            <a class="nav-link {% if endpoint == 'index' %}active{% endif %}" href="{{ url_for('index') }}">Inicio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if endpoint.startswith('jugadores.') %}active{% endif %}" href="{{ url_for('jugadores.listar') }}">Jugadores</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if endpoint.startswith('informes.') %}active{% endif %}" href="{{ url_for('informes.general') }}">Informe General</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if endpoint == 'datos.importar' %}active{% endif %}" href="{{ url_for('datos.importar') }}">Importar</a>
+                        </li>
+                        <li class="nav-item ms-lg-2">
+                            <a class="btn btn-sm btn-accent" href="{{ url_for('datos.exportar') }}">Exportar</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
-        </div>
-    </nav>
+        </nav>
+    </header>
 
-    <div class="flash-container">
-        <div class="container-fluid mt-2">
+    <div class="flash-container px-3 px-lg-4">
+        <div class="container-fluid pt-2">
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
-                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm" role="alert">
                             {{ message }}
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
@@ -54,7 +69,7 @@
         </div>
     </div>
 
-    <main class="container-fluid mt-3 mb-5">
+    <main class="container-fluid app-shell px-3 px-lg-4 pb-5">
         {% block content %}{% endblock %}
     </main>
 

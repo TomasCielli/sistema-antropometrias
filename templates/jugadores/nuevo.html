@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% block title %}Nuevo Jugador — Albatros Rugby Club{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
+<div class="d-flex justify-content-between align-items-center mb-3" data-reveal>
     <h2>Nuevo Jugador</h2>
     <a href="{{ url_for('jugadores.listar') }}" class="btn btn-outline-secondary">Volver</a>
 </div>
 
-<form method="POST" action="{{ url_for('jugadores.crear') }}">
+<form method="POST" action="{{ url_for('jugadores.crear') }}" class="surface-card" data-reveal>
     <div class="row g-3">
         <div class="col-md-4">
             <label for="apellido" class="form-label">Apellido *</label>

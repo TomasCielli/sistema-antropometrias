@@ -1,44 +1,46 @@
 {% extends "base.html" %}
 {% block title %}Jugadores — Albatros Rugby Club{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
+<div class="d-flex justify-content-between align-items-center mb-3" data-reveal>
     <h2>Jugadores</h2>
     <a href="{{ url_for('jugadores.nuevo') }}" class="btn btn-primary">Nuevo jugador</a>
 </div>
 
-<div class="row g-2 mb-3">
-    <div class="col-md-6">
-        <input type="text" id="search-input" class="form-control"
-               placeholder="Buscar por nombre, apellido o DNI…">
-    </div>
-    <div class="col-md-3">
-        <select id="filter-categoria" class="form-select">
-            <option value="">Todas las categorías</option>
-            {% for cat in categorias %}
-            <option value="{{ cat }}">{{ cat }}</option>
-            {% endfor %}
-        </select>
-    </div>
-    <div class="col-md-3">
-        <select id="filter-sexo" class="form-select">
-            <option value="">Todos</option>
-            {% for s in sexos %}
-            <option value="{{ s }}">{{ s }}</option>
-            {% endfor %}
-        </select>
+<div class="surface-card mb-3" data-reveal>
+    <div class="row g-2">
+        <div class="col-md-6">
+            <input type="text" id="search-input" class="form-control"
+                   placeholder="Buscar por nombre, apellido o DNI…">
+        </div>
+        <div class="col-md-3">
+            <select id="filter-categoria" class="form-select">
+                <option value="">Todas las categorías</option>
+                {% for cat in categorias %}
+                <option value="{{ cat }}">{{ cat }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select id="filter-sexo" class="form-select">
+                <option value="">Todos</option>
+                {% for s in sexos %}
+                <option value="{{ s }}">{{ s }}</option>
+                {% endfor %}
+            </select>
+        </div>
     </div>
 </div>
 
 {% if jugadores %}
 <form id="form-masivo" method="POST" action="{{ url_for('jugadores.eliminar_masivo') }}">
-    <div id="bulk-actions" class="mb-3 d-none">
+    <div id="bulk-actions" class="mb-3 d-none" data-reveal>
         <button type="submit" class="btn btn-danger btn-sm"
                 onclick="return confirm('¿Seguro que querés eliminar los jugadores seleccionados? Se eliminarán todas sus antropometrías.')">
             Eliminar seleccionados (<span id="count-selected">0</span>)
         </button>
     </div>
 
-    <div class="table-responsive">
+    <div class="table-responsive surface-card" data-reveal>
         <table class="table table-striped table-hover">
             <thead class="table-dark">
                 <tr>
@@ -88,7 +90,7 @@
     </div>
 </form>
 {% else %}
-<div class="alert alert-info">
+<div class="empty-state" data-reveal>
     No hay jugadores registrados. <a href="{{ url_for('jugadores.nuevo') }}">Crear el primero</a>.
 </div>
 {% endif %}

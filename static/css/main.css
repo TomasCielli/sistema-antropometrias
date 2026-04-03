@@ -1,27 +1,402 @@
-/* Custom styles for Albatros Rugby Club - Antropometrías */
+:root {
+    --bg: #eef3fb;
+    --surface: #ffffff;
+    --surface-soft: #f7f9ff;
+    --ink: #162d3d;
+    --muted: #4f6777;
+    --border: #d2dbea;
+    --primary: #0e4f9c;
+    --primary-strong: #0a3f7f;
+    --accent: #c62839;
+    --accent-strong: #9f1f2d;
+    --hero-a: #0f3e70;
+    --hero-b: #174e92;
+    --club-red-soft: #e34a5a;
+    --shadow-sm: 0 8px 22px rgba(13, 33, 51, 0.08);
+    --shadow-md: 0 16px 38px rgba(13, 33, 51, 0.12);
+}
+
+* {
+    box-sizing: border-box;
+}
 
 body {
-    background-color: #f8f9fa;
+    min-height: 100vh;
+    color: var(--ink);
+    font-family: "Source Sans 3", sans-serif;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.35)),
+        repeating-linear-gradient(
+            0deg,
+            rgba(15, 62, 112, 0.045) 0,
+            rgba(15, 62, 112, 0.045) 28px,
+            rgba(255, 255, 255, 0) 28px,
+            rgba(255, 255, 255, 0) 56px
+        ),
+        radial-gradient(circle at 5% 10%, rgba(15, 62, 112, 0.1), transparent 38%),
+        radial-gradient(circle at 95% 15%, rgba(198, 40, 57, 0.12), transparent 40%),
+        linear-gradient(180deg, #f7f9ff 0%, #edf2fa 52%, #e8eef8 100%);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.navbar-brand {
+    font-family: "Sora", sans-serif;
+}
+
+.bg-orb {
+    position: fixed;
+    width: 480px;
+    height: 480px;
+    border-radius: 50%;
+    filter: blur(50px);
+    pointer-events: none;
+    z-index: -1;
+}
+
+.bg-orb-a {
+    top: -180px;
+    left: -120px;
+    background: rgba(15, 62, 112, 0.14);
+}
+
+.bg-orb-b {
+    top: 20%;
+    right: -200px;
+    background: rgba(198, 40, 57, 0.16);
+}
+
+.app-header {
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    padding: 0.8rem 0;
+    transition: padding 0.25s ease;
+}
+
+.app-header.compact {
+    padding: 0.35rem 0;
+}
+
+.navbar-custom {
+    margin: 0 auto;
+    width: calc(100% - 1.2rem);
+    border-radius: 14px;
+    background: linear-gradient(120deg, rgba(17, 41, 62, 0.92), rgba(12, 68, 95, 0.92));
+    border: 1px solid rgba(214, 226, 234, 0.18);
+    box-shadow: var(--shadow-md);
+    backdrop-filter: blur(8px);
 }
 
 .navbar-brand {
     font-weight: 700;
+    line-height: 1.1;
 }
 
-.card-header {
+.brand-copy {
+    display: flex;
+    flex-direction: column;
+}
+
+.brand-copy small {
+    color: #b6cad8;
+    font-size: 0.78rem;
+    font-weight: 500;
+}
+
+.nav-link {
+    border-radius: 10px;
+    color: #d8e4ed;
     font-weight: 600;
+    padding: 0.45rem 0.75rem;
+    transition: background 0.2s ease, color 0.2s ease;
 }
 
-.table th {
-    white-space: nowrap;
+.nav-link:hover,
+.nav-link.active {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.14);
 }
 
-.btn-group-actions .btn {
-    margin-right: 0.25rem;
+.nav-link.active {
+    box-shadow: inset 0 -2px 0 var(--club-red-soft);
+}
+
+.app-shell {
+    margin-top: 0.35rem;
 }
 
 .flash-container {
     position: sticky;
-    top: 56px;
+    top: 72px;
     z-index: 1020;
+}
+
+.alert {
+    border-radius: 12px;
+}
+
+.hero-panel {
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    padding: 2.2rem;
+    background: linear-gradient(125deg, var(--hero-a) 0%, var(--hero-b) 56%, #215fb0 100%);
+    box-shadow: var(--shadow-md);
+}
+
+.hero-panel::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.33;
+    background:
+        linear-gradient(90deg, transparent 0, transparent 46%, rgba(255, 255, 255, 0.58) 46.4%, rgba(255, 255, 255, 0.58) 47.2%, transparent 47.4%, transparent 100%),
+        linear-gradient(140deg, transparent 72%, rgba(227, 74, 90, 0.55) 72.4%, rgba(227, 74, 90, 0.55) 79%, transparent 79.3%);
+}
+
+.hero-panel::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, rgba(255, 255, 255, 0.16), transparent 42%);
+}
+
+.hero-copy {
+    position: relative;
+    z-index: 1;
+    max-width: 760px;
+    color: #f2fbff;
+}
+
+.hero-copy h1 {
+    font-size: clamp(1.45rem, 3vw, 2.1rem);
+    font-weight: 700;
+}
+
+.hero-lead {
+    font-size: 1.06rem;
+    opacity: 0.95;
+}
+
+.eyebrow {
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-size: 0.76rem;
+    font-weight: 700;
+    opacity: 0.82;
+    color: #ffd5da;
+}
+
+.btn {
+    border-radius: 10px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+.btn-primary {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-primary:hover {
+    background: var(--primary-strong);
+    border-color: var(--primary-strong);
+}
+
+.btn-accent {
+    color: #fff;
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 8px 18px rgba(198, 40, 57, 0.28);
+}
+
+.btn-accent:hover {
+    color: #fff;
+    background: var(--accent-strong);
+    border-color: var(--accent-strong);
+}
+
+.metric-card {
+    height: 100%;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+    padding: 1rem 1.1rem;
+    border-top: 4px solid #1f57a4;
+}
+
+.metric-label {
+    margin-bottom: 0.4rem;
+    font-size: 0.82rem;
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.metric-value {
+    margin-bottom: 0.15rem;
+    font-family: "Sora", sans-serif;
+    font-size: clamp(1.35rem, 2.5vw, 2rem);
+    font-weight: 700;
+    color: #104466;
+}
+
+.metric-help {
+    color: var(--muted);
+    font-size: 0.92rem;
+}
+
+.surface-card,
+.card {
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+    border-top: 1px solid #d9e2f0;
+}
+
+.card-header {
+    border-bottom: 1px solid var(--border);
+    border-top-left-radius: 16px !important;
+    border-top-right-radius: 16px !important;
+    background: var(--surface-soft);
+    font-weight: 600;
+}
+
+.surface-card {
+    padding: 1.05rem;
+}
+
+.quick-actions {
+    display: grid;
+    gap: 0.7rem;
+}
+
+.quick-link {
+    display: block;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0.75rem 0.85rem;
+    text-decoration: none;
+    color: var(--ink);
+    background: #fcfdff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.quick-link:hover {
+    transform: translateY(-2px);
+    border-color: #becce3;
+    box-shadow: 0 8px 24px rgba(20, 58, 117, 0.13);
+    color: var(--ink);
+}
+
+.quick-link span {
+    display: block;
+    font-weight: 700;
+}
+
+.quick-link small {
+    display: block;
+    color: var(--muted);
+}
+
+.table-responsive {
+    border-radius: 12px;
+}
+
+.table-modern thead th,
+.table thead th {
+    border-bottom-width: 1px;
+    white-space: nowrap;
+}
+
+.table-modern tbody tr,
+.table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #eef3ff;
+}
+
+.table-dark {
+    --bs-table-bg: #123f66;
+}
+
+.btn-group-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+}
+
+.form-control,
+.form-select {
+    border-radius: 10px;
+    border-color: #c9d8e4;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #8ea9d1;
+    box-shadow: 0 0 0 0.2rem rgba(30, 78, 150, 0.15);
+}
+
+.form-label {
+    font-weight: 600;
+    color: #2e546b;
+}
+
+.empty-state {
+    border-radius: 14px;
+    border: 1px dashed #bccde5;
+    background: #f5f8ff;
+    color: #2e5868;
+    padding: 1rem;
+}
+
+[data-reveal] {
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+[data-reveal].revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+@media (max-width: 991px) {
+    .navbar-custom {
+        width: calc(100% - 0.75rem);
+    }
+
+    .hero-panel {
+        padding: 1.45rem;
+    }
+
+    .flash-container {
+        top: 64px;
+    }
+}
+
+@media (max-width: 575px) {
+    .brand-copy small {
+        display: none;
+    }
+
+    .hero-copy h1 {
+        font-size: 1.28rem;
+    }
+
+    .surface-card,
+    .card {
+        border-radius: 13px;
+    }
 }

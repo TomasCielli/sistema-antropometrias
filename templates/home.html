@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}Inicio — Albatros Rugby Club{% endblock %}
+{% block content %}
+<section class="hero-panel mb-4" data-reveal>
+    <div class="hero-copy">
+        <p class="eyebrow mb-2">Centro de rendimiento</p>
+        <h1 class="mb-3">Seguimiento antropométrico del plantel con mirada deportiva</h1>
+        <p class="hero-lead mb-4">
+            Organizá jugadores, mediciones e informes en un tablero ágil,
+            pensado para decisiones de campo y planificación física.
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{{ url_for('jugadores.nuevo') }}" class="btn btn-accent">Nuevo jugador</a>
+            <a href="{{ url_for('informes.general') }}" class="btn btn-outline-light">Ver informe general</a>
+            <a href="{{ url_for('datos.importar') }}" class="btn btn-outline-light">Importar datos</a>
+        </div>
+    </div>
+</section>
+
+<section class="row g-3 mb-4">
+    <div class="col-12 col-md-6 col-xl-3" data-reveal>
+        <article class="metric-card">
+            <p class="metric-label">Jugadores activos</p>
+            <p class="metric-value">{{ total_jugadores }}</p>
+            <p class="metric-help mb-0">Registro total en base</p>
+        </article>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3" data-reveal>
+        <article class="metric-card">
+            <p class="metric-label">Mediciones cargadas</p>
+            <p class="metric-value">{{ total_mediciones }}</p>
+            <p class="metric-help mb-0">Histórico acumulado</p>
+        </article>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3" data-reveal>
+        <article class="metric-card">
+            <p class="metric-label">Sin mediciones</p>
+            <p class="metric-value">{{ jugadores_sin_medicion }}</p>
+            <p class="metric-help mb-0">Jugadores pendientes</p>
+        </article>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3" data-reveal>
+        <article class="metric-card">
+            <p class="metric-label">Últimos 30 días</p>
+            <p class="metric-value">{{ mediciones_30_dias }}</p>
+            <p class="metric-help mb-0">Nuevas mediciones</p>
+        </article>
+    </div>
+</section>
+
+<section class="row g-3">
+    <div class="col-12 col-xl-8" data-reveal>
+        <div class="surface-card h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h5 mb-0">Actividad reciente</h2>
+                <a href="{{ url_for('jugadores.listar') }}" class="btn btn-sm btn-outline-secondary">Ir a jugadores</a>
+            </div>
+
+            {% if ultimas_mediciones %}
+            <div class="table-responsive">
+                <table class="table table-modern align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Jugador</th>
+                            <th>Peso</th>
+                            <th>Talla</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in ultimas_mediciones %}
+                        <tr>
+                            <td>{{ item.fecha }}</td>
+                            <td>{{ item.apellido }}, {{ item.nombre }}</td>
+                            <td>{{ item.peso if item.peso is not none else '—' }} {% if item.peso is not none %}kg{% endif %}</td>
+                            <td>{{ item.talla_corporal if item.talla_corporal is not none else '—' }} {% if item.talla_corporal is not none %}cm{% endif %}</td>
+                            <td class="text-end">
+                                <a href="{{ url_for('antropometrias.historial', id=item.jugador_id) }}" class="btn btn-sm btn-outline-primary">Ver historial</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state mb-0">
+                <p class="mb-2">Todavía no hay mediciones registradas.</p>
+                <a href="{{ url_for('jugadores.listar') }}" class="btn btn-sm btn-accent">Cargar la primera</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="col-12 col-xl-4" data-reveal>
+        <div class="surface-card h-100">
+            <h2 class="h5 mb-3">Accesos rápidos</h2>
+            <div class="quick-actions">
+                <a href="{{ url_for('jugadores.listar') }}" class="quick-link">
+                    <span>Gestión de jugadores</span>
+                    <small>Editar datos, filtros y acciones masivas</small>
+                </a>
+                <a href="{{ url_for('informes.general') }}" class="quick-link">
+                    <span>Informe general</span>
+                    <small>Comparar variables antropométricas</small>
+                </a>
+                <a href="{{ url_for('datos.importar') }}" class="quick-link">
+                    <span>Importar Excel</span>
+                    <small>Actualizar datos desde planillas</small>
+                </a>
+                <a href="{{ url_for('datos.exportar') }}" class="quick-link">
+                    <span>Exportar backup</span>
+                    <small>Descargar un respaldo completo</small>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

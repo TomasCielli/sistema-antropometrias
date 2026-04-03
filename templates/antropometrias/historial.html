@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Antropometrías de {{ jugador.apellido }}, {{ jugador.nombre }} — Albatros Rugby Club{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
+<div class="d-flex justify-content-between align-items-center mb-3" data-reveal>
     <div>
         <h2>{{ jugador.apellido }}, {{ jugador.nombre }}</h2>
         <p class="text-muted mb-0">
@@ -18,14 +18,14 @@
 
 {% if antropometrias %}
 <form id="form-masivo" method="POST" action="{{ url_for('antropometrias.eliminar_masivo', id=jugador.id) }}">
-    <div id="bulk-actions" class="mb-3 d-none">
+    <div id="bulk-actions" class="mb-3 d-none" data-reveal>
         <button type="submit" class="btn btn-danger btn-sm"
                 onclick="return confirm('¿Seguro que querés eliminar las mediciones seleccionadas?')">
             Eliminar seleccionadas (<span id="count-selected">0</span>)
         </button>
     </div>
 
-    <div class="table-responsive">
+    <div class="table-responsive surface-card" data-reveal>
         <table class="table table-striped table-hover">
             <thead class="table-dark">
                 <tr>
@@ -65,7 +65,7 @@
     </div>
 </form>
 {% else %}
-<div class="alert alert-info">
+<div class="empty-state" data-reveal>
     Sin mediciones registradas. <a href="{{ url_for('antropometrias.nueva', id=jugador.id) }}">Cargar la primera</a>.
 </div>
 {% endif %}

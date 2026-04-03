@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% block title %}Importar Datos — Albatros Rugby Club{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
+<div class="d-flex justify-content-between align-items-center mb-3" data-reveal>
     <h2>Importar Datos</h2>
     <a href="{{ url_for('jugadores.listar') }}" class="btn btn-outline-secondary">Volver</a>
 </div>
 
-<div class="card mb-4">
+<div class="card mb-4" data-reveal>
     <div class="card-body">
         <h5 class="card-title">Subir archivo Excel</h5>
         <p class="text-muted">
@@ -28,7 +28,7 @@
     </div>
 </div>
 
-<div class="card">
+<div class="card" data-reveal>
     <div class="card-header">Formato esperado</div>
     <div class="card-body">
         <h6>Hoja "Jugadores"</h6>

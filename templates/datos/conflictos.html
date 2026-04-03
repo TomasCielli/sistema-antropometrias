@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% block title %}Conflictos en la importación — Albatros Rugby Club{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
+<div class="d-flex justify-content-between align-items-center mb-3" data-reveal>
     <h2>Conflictos detectados en la importación</h2>
     <a href="{{ url_for('datos.importar') }}" class="btn btn-outline-secondary">Cancelar</a>
 </div>
 
-<div class="alert alert-warning">
+<div class="alert alert-warning" data-reveal>
     <strong>Se encontraron {{ conflictos|length }} jugador(es) con datos diferentes al archivo importado.</strong>
     Revisá cada caso y elegí qué versión querés conservar. Los jugadores nuevos ({{ total_nuevos }}) y las
     antropometrías ({{ total_antro }}) se procesarán junto con tu decisión.
@@ -15,7 +15,7 @@
 <form method="POST" action="{{ url_for('datos.resolver_conflictos') }}">
 
     {% for c in conflictos %}
-    <div class="card mb-4 border-warning">
+    <div class="card mb-4 border-warning" data-reveal>
         <div class="card-header bg-warning bg-opacity-25">
             <strong>DNI: {{ c.dni }}</strong>
             — {{ c.nombre_db }}
@@ -72,7 +72,7 @@
     {% endfor %}
 
     {% if errores_jug or errores_ant %}
-    <div class="card mb-4 border-danger">
+    <div class="card mb-4 border-danger" data-reveal>
         <div class="card-header bg-danger bg-opacity-10">
             <strong>Errores detectados en el archivo</strong>
             (estas filas serán ignoradas)
@@ -90,7 +90,7 @@
     </div>
     {% endif %}
 
-    <div class="d-flex gap-2 mb-5">
+    <div class="d-flex gap-2 mb-5" data-reveal>
         <button type="submit" class="btn btn-primary">Confirmar e importar</button>
         <a href="{{ url_for('datos.importar') }}" class="btn btn-outline-secondary">Cancelar</a>
     </div>
