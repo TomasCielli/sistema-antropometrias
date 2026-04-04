@@ -214,18 +214,18 @@
 <table>
     <thead>
         <tr>
-            <th>Jugador</th>
-            <th>Fecha</th>
-            <th>Peso (kg)</th>
-            <th>% Grasa</th>
-            <th>Masa Muscular (kg)</th>
-            <th>% Muscular</th>
+            <th style="width:22%">Jugador</th>
+            <th style="width:18%">Fecha</th>
+            <th style="width:12%">Peso (kg)</th>
+            <th style="width:12%">% Grasa</th>
+            <th style="width:18%">Masa Musc. (kg)</th>
+            <th style="width:18%">% Muscular</th>
         </tr>
     </thead>
     <tbody>
         {% for s in stats_grupo %}
         <tr>
-            <td class="label-cell">{{ s.nombre }}</td>
+            <td class="label-cell">{{ s.nombre.split(",")[0] }}, {{ s.nombre.split(",")[1].strip()[0] }}.</td>
             <td>{{ s.fecha or '&mdash;' }}</td>
             <td>{{ s.peso if s.peso is not none else '&mdash;' }}</td>
             <td>{{ "%.1f"|format(s.pct_grasa) ~ "%" if s.pct_grasa is not none else '&mdash;' }}</td>
