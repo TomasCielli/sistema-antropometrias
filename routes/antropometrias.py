@@ -7,8 +7,14 @@ from models.antropometrias import (
     obtener_antropometria_por_id, obtener_antropometrias_de_jugador
 )
 from models.jugadores import CATEGORIAS, POSICIONES, obtener_jugador_por_id
-from models.informes import calcular_composicion_completa, calcular_edad
-from models.graficos import grafico_composicion_pie, grafico_pliegues_bar, grafico_perimetros_bar
+from models.informes import (
+    calcular_composicion_completa, calcular_edad,
+    obtener_historico_composicion,
+)
+from models.graficos import (
+    grafico_composicion_pie, grafico_pliegues_bar, grafico_perimetros_bar,
+    grafico_evolucion, grafico_comparacion_componentes,
+)
 
 antropometrias_bp = Blueprint("antropometrias", __name__)
 
@@ -121,21 +127,23 @@ def _preparar_informe(id):
     """Shared logic for informe HTML and PDF."""
     antropometria = obtener_antropometria_por_id(id)
     if not antropometria:
-        return None, None, None, None, None
+        return None, None, None, None, None, None
     jugador = obtener_jugador_por_id(antropometria["jugador_id"])
     edad = calcular_edad(jugador.get("fecha_nacimiento"), antropometria.get("fecha"))
     comp = calcular_composicion_completa(jugador, antropometria)
+    historico = obtener_historico_composicion(antropometria["jugador_id"], jugador)
     graficos = {
         "composicion": grafico_composicion_pie(comp),
         "pliegues": grafico_pliegues_bar(antropometria, LABELS),
         "perimetros": grafico_perimetros_bar(antropometria, LABELS),
+        "evolucion": grafico_evolucion(historico, antro_id_actual=id),
     }
-    return antropometria, jugador, edad, comp, graficos
+    return antropometria, jugador, edad, comp, graficos, historico
 
 
 @antropometrias_bp.route("/antropometrias/<int:id>/informe")
 def informe(id):
-    antropometria, jugador, edad, comp, graficos = _preparar_informe(id)
+    antropometria, jugador, edad, comp, graficos, historico = _preparar_informe(id)
     if not antropometria:
         abort(404)
     return render_template("antropometrias/informe.html",
@@ -144,6 +152,7 @@ def informe(id):
                            edad=edad,
                            comp=comp,
                            graficos=graficos,
+                           historico=historico,
                            secciones=SECCIONES,
                            labels=LABELS)
 
@@ -154,7 +163,7 @@ def informe_pdf(id):
     import os
     from xhtml2pdf import pisa
 
-    antropometria, jugador, edad, comp, graficos = _preparar_informe(id)
+    antropometria, jugador, edad, comp, graficos, historico = _preparar_informe(id)
     if not antropometria:
         abort(404)
 
@@ -172,6 +181,7 @@ def informe_pdf(id):
                            edad=edad,
                            comp=comp,
                            graficos=graficos,
+                           historico=historico,
                            logo_b64=logo_b64,
                            secciones=SECCIONES,
                            labels=LABELS)
@@ -290,3 +300,60 @@ def eliminar_masivo(id):
             pass
     flash(f"{eliminados} medición(es) eliminada(s)", "success")
     return redirect(url_for("antropometrias.historial", id=id))
+
+
+@antropometrias_bp.route("/antropometrias/comparar")
+def comparar():
+    ids_str = request.args.get("ids", "")
+    ids = [int(i) for i in ids_str.split(",") if i.strip().isdigit()]
+
+    if len(ids) < 2:
+        flash("Seleccioná al menos 2 mediciones para comparar", "warning")
+        return redirect(url_for("jugadores.listar"))
+
+    items = []
+    for aid in ids:
+        a = obtener_antropometria_por_id(aid)
+        if not a:
+            continue
+        jugador = obtener_jugador_por_id(a["jugador_id"])
+        edad = calcular_edad(jugador.get("fecha_nacimiento"), a.get("fecha"))
+        comp = calcular_composicion_completa(jugador, a)
+        items.append({
+            "antropometria": a,
+            "jugador": jugador,
+            "edad": edad,
+            "comp": comp,
+            "label": f"{a['fecha']} ({jugador['apellido']})",
+        })
+
+    if len(items) < 2:
+        flash("No se pudieron cargar las mediciones seleccionadas", "danger")
+        return redirect(url_for("jugadores.listar"))
+
+    # Compute deltas relative to the first item
+    primera_comp = items[0]["comp"]
+    primera_antro = items[0]["antropometria"]
+    campos_delta = [
+        "pct_grasa", "pct_muscular", "masa_adiposa", "masa_muscular",
+        "masa_osea", "masa_residual", "masa_piel",
+    ]
+    for item in items[1:]:
+        deltas = {}
+        for key in campos_delta:
+            v1 = primera_comp.get(key)
+            v2 = item["comp"].get(key)
+            deltas[key] = round(v2 - v1, 2) if v1 is not None and v2 is not None else None
+        peso_v1 = primera_antro.get("peso")
+        peso_v2 = item["antropometria"].get("peso")
+        deltas["peso"] = round(peso_v2 - peso_v1, 2) if peso_v1 is not None and peso_v2 is not None else None
+        item["deltas"] = deltas
+    items[0]["deltas"] = None
+
+    grafico = grafico_comparacion_componentes(items)
+
+    return render_template("antropometrias/comparar.html",
+                           items=items,
+                           grafico=grafico,
+                           secciones=SECCIONES,
+                           labels=LABELS)

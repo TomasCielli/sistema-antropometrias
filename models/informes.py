@@ -266,3 +266,63 @@ def obtener_datos_informe(categoria=None, posicion=None, sexo=None):
 
     conn.close()
     return resultado
+
+
+def obtener_historico_composicion(jugador_id, jugador):
+    """Return all anthropometry records for a player with composition calculated.
+
+    Results sorted by date ascending so charts render left-to-right chronologically.
+    Each entry: id, fecha, peso, pct_grasa, pct_muscular, masa_adiposa, masa_muscular,
+                masa_osea, masa_residual, masa_piel, suma_6_pliegues.
+    """
+    conn = get_connection()
+    c = conn.cursor()
+    c.execute("SELECT * FROM antropometrias WHERE jugador_id = ? ORDER BY fecha ASC", [jugador_id])
+    rows = [dict(r) for r in c.fetchall()]
+    conn.close()
+
+    resultado = []
+    for a in rows:
+        comp = calcular_composicion_completa(jugador, a)
+        resultado.append({
+            "id": a["id"],
+            "fecha": a["fecha"],
+            "peso": a.get("peso"),
+            "pct_grasa": comp.get("pct_grasa"),
+            "pct_muscular": comp.get("pct_muscular"),
+            "masa_adiposa": comp.get("masa_adiposa"),
+            "masa_muscular": comp.get("masa_muscular"),
+            "masa_osea": comp.get("masa_osea"),
+            "masa_residual": comp.get("masa_residual"),
+            "masa_piel": comp.get("masa_piel"),
+            "suma_6_pliegues": comp.get("suma_6_pliegues"),
+        })
+    return resultado
+
+
+def obtener_estadisticas_grupales(datos):
+    """Extract per-player stats from the most recent measurement of each player.
+
+    datos: output of obtener_datos_informe() — list of {jugador, mediciones}.
+    Returns list of dicts with keys: nombre, pct_grasa, pct_muscular, peso, fecha.
+    Only includes players with at least one valid measurement.
+    """
+    resultado = []
+    for item in datos:
+        if not item["mediciones"]:
+            continue
+        # mediciones are ordered DESC, so index 0 is the most recent
+        ultima = item["mediciones"][0]
+        if ultima.get("pct_grasa") is None and ultima.get("pct_muscular") is None:
+            continue
+        jugador = item["jugador"]
+        resultado.append({
+            "nombre": f"{jugador['apellido']}, {jugador['nombre']}",
+            "pct_grasa": ultima.get("pct_grasa"),
+            "pct_muscular": ultima.get("masa_muscular") / ultima.get("peso") * 100
+                            if ultima.get("masa_muscular") and ultima.get("peso") else None,
+            "masa_muscular": ultima.get("masa_muscular"),
+            "peso": ultima.get("peso"),
+            "fecha": ultima.get("fecha"),
+        })
+    return resultado

@@ -124,3 +124,16 @@ function confirmarEliminar(nombre, tipo) {
         return confirm("¿Seguro que querés eliminar la medición del " + nombre + "?");
     }
 }
+
+// Compare selected anthropometries
+function compararSeleccionadas() {
+    const checks = document.querySelectorAll(".row-check:checked");
+    if (checks.length < 2) {
+        alert("Seleccioná al menos 2 mediciones para comparar.");
+        return;
+    }
+    const ids = Array.from(checks).map(function (cb) { return cb.value; }).join(",");
+    const form = document.getElementById("form-masivo");
+    const baseUrl = form ? form.dataset.compararUrl : "/antropometrias/comparar";
+    window.location.href = baseUrl + "?ids=" + ids;
+}

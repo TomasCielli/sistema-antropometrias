@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request
-from models.informes import obtener_datos_informe
+from models.informes import obtener_datos_informe, obtener_estadisticas_grupales
 from models.jugadores import CATEGORIAS, POSICIONES, SEXOS
+from models.graficos import grafico_grupo_comparativa
 
 informes_bp = Blueprint("informes", __name__)
 
@@ -17,8 +18,13 @@ def general():
         sexo=sexo or None
     )
 
+    stats_grupo = obtener_estadisticas_grupales(datos)
+    grafico_grupo = grafico_grupo_comparativa(stats_grupo)
+
     return render_template("informes/general.html",
                            datos=datos,
+                           stats_grupo=stats_grupo,
+                           grafico_grupo=grafico_grupo,
                            categorias=CATEGORIAS,
                            posiciones=POSICIONES,
                            sexos=SEXOS,
