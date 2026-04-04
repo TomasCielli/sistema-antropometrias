@@ -21,7 +21,7 @@ if errorlevel 1 (
 
 :: Instalar dependencias si faltan
 echo  Verificando dependencias...
-pip install flask openpyxl --quiet
+pip install -r requirements.txt --quiet
 
 echo.
 echo  Iniciando el servidor...
