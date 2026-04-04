@@ -50,14 +50,11 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 6px;
-            table-layout: fixed;
         }
         th, td {
             border: 1px solid #ccc;
-            padding: 3px 4px;
+            padding: 3px 5px;
             font-size: 8px;
-            word-wrap: break-word;
-            overflow: hidden;
         }
         th {
             background: #ecf0f1;
@@ -132,9 +129,9 @@
 <table>
     <thead>
         <tr>
-            <th style="width:16%">Dato</th>
+            <th>Dato</th>
             {% for m in item.mediciones %}
-            <th style="width:{{ (84 / item.mediciones|length)|round|int }}%">{{ m.fecha }}</th>
+            <th>{{ m.fecha }}</th>
             {% endfor %}
         </tr>
     </thead>
@@ -217,12 +214,12 @@
 <table>
     <thead>
         <tr>
-            <th style="width:28%">Jugador</th>
-            <th style="width:14%">Fecha</th>
-            <th style="width:14%">Peso (kg)</th>
-            <th style="width:14%">% Grasa</th>
-            <th style="width:15%">Masa Muscular (kg)</th>
-            <th style="width:15%">% Muscular</th>
+            <th>Jugador</th>
+            <th>Fecha</th>
+            <th>Peso (kg)</th>
+            <th>% Grasa</th>
+            <th>Masa Muscular (kg)</th>
+            <th>% Muscular</th>
         </tr>
     </thead>
     <tbody>
