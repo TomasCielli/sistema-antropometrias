@@ -211,49 +211,41 @@
 <!-- Resumen estadístico -->
 {% if stats_grupo %}
 <h2>Resumen Estadistico</h2>
-<table style="table-layout:fixed;">
-    <colgroup>
-        <col style="width:25%">
-        <col style="width:15%">
-        <col style="width:12%">
-        <col style="width:12%">
-        <col style="width:18%">
-        <col style="width:18%">
-    </colgroup>
+<table>
     <thead>
         <tr>
-            <th>Jugador</th>
-            <th>Fecha</th>
-            <th>Peso (kg)</th>
-            <th>% Grasa</th>
-            <th>Masa Musc. (kg)</th>
-            <th>% Muscular</th>
+            <th width="190">Jugador</th>
+            <th width="120">Fecha</th>
+            <th width="90">Peso (kg)</th>
+            <th width="90">% Grasa</th>
+            <th width="120">Masa Musc. (kg)</th>
+            <th width="120">% Muscular</th>
         </tr>
     </thead>
     <tbody>
         {% for s in stats_grupo %}
         <tr>
-            <td class="label-cell">{{ s.nombre }}</td>
-            <td>{{ s.fecha or '&mdash;' }}</td>
-            <td>{{ s.peso if s.peso is not none else '&mdash;' }}</td>
-            <td>{{ "%.1f"|format(s.pct_grasa) ~ "%" if s.pct_grasa is not none else '&mdash;' }}</td>
-            <td>{{ "%.1f"|format(s.masa_muscular) if s.masa_muscular is not none else '&mdash;' }}</td>
-            <td>{{ "%.1f"|format(s.pct_muscular) ~ "%" if s.pct_muscular is not none else '&mdash;' }}</td>
+            <td class="label-cell" width="190">{{ s.nombre }}</td>
+            <td width="120">{{ s.fecha or '&mdash;' }}</td>
+            <td width="90">{{ s.peso if s.peso is not none else '&mdash;' }}</td>
+            <td width="90">{{ "%.1f"|format(s.pct_grasa) ~ "%" if s.pct_grasa is not none else '&mdash;' }}</td>
+            <td width="120">{{ "%.1f"|format(s.masa_muscular) if s.masa_muscular is not none else '&mdash;' }}</td>
+            <td width="120">{{ "%.1f"|format(s.pct_muscular) ~ "%" if s.pct_muscular is not none else '&mdash;' }}</td>
         </tr>
         {% endfor %}
     </tbody>
     <tfoot>
         <tr class="highlight">
-            <th class="label-cell">Promedio</th>
-            <td></td>
+            <th class="label-cell" width="190">Promedio</th>
+            <td width="120"></td>
             {% set pesos_v = stats_grupo | selectattr("peso") | map(attribute="peso") | list %}
             {% set grasa_v = stats_grupo | selectattr("pct_grasa") | map(attribute="pct_grasa") | list %}
             {% set musc_v  = stats_grupo | selectattr("masa_muscular") | map(attribute="masa_muscular") | list %}
             {% set pmusc_v = stats_grupo | selectattr("pct_muscular") | map(attribute="pct_muscular") | list %}
-            <th>{{ "%.1f"|format(pesos_v|sum / pesos_v|length) if pesos_v else '&mdash;' }}</th>
-            <th>{{ "%.1f"|format(grasa_v|sum / grasa_v|length) ~ "%" if grasa_v else '&mdash;' }}</th>
-            <th>{{ "%.1f"|format(musc_v|sum / musc_v|length) if musc_v else '&mdash;' }}</th>
-            <th>{{ "%.1f"|format(pmusc_v|sum / pmusc_v|length) ~ "%" if pmusc_v else '&mdash;' }}</th>
+            <th width="90">{{ "%.1f"|format(pesos_v|sum / pesos_v|length) if pesos_v else '&mdash;' }}</th>
+            <th width="90">{{ "%.1f"|format(grasa_v|sum / grasa_v|length) ~ "%" if grasa_v else '&mdash;' }}</th>
+            <th width="120">{{ "%.1f"|format(musc_v|sum / musc_v|length) if musc_v else '&mdash;' }}</th>
+            <th width="120">{{ "%.1f"|format(pmusc_v|sum / pmusc_v|length) ~ "%" if pmusc_v else '&mdash;' }}</th>
         </tr>
     </tfoot>
 </table>
