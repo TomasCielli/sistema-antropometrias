@@ -1,7 +1,13 @@
 {% extends "base.html" %}
 {% block title %}Informe General — Albatros Rugby Club{% endblock %}
 {% block content %}
-<h2 class="mb-3" data-reveal>Informe General</h2>
+<div class="d-flex justify-content-between align-items-center mb-3" data-reveal>
+    <h2 class="mb-0">Informe General</h2>
+    {% if datos %}
+    <a href="{{ url_for('informes.general_pdf', categoria=filtro_categoria, posicion=filtro_posicion, sexo=filtro_sexo) }}"
+       class="btn btn-danger">Descargar PDF</a>
+    {% endif %}
+</div>
 
 <form method="GET" action="{{ url_for('informes.general') }}" class="row g-2 mb-4 surface-card" data-reveal>
     <div class="col-md-3">

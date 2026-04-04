@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 15mm 12mm 20mm 12mm;
+            @frame footer {
+                -pdf-frame-content: footer-content;
+                bottom: 0mm;
+                margin-left: 0mm;
+                margin-right: 0mm;
+                height: 10mm;
+            }
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 9px;
+            color: #2c2c2c;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            overflow: hidden;
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 6px;
+            margin-bottom: 10px;
+        }
+        .header-logo { float: left; width: 50px; }
+        .header-logo img { width: 44px; height: 44px; }
+        .header-text { float: left; margin-left: 10px; }
+        .header-text h1 { font-size: 14px; margin: 0 0 2px 0; color: #2c3e50; }
+        .header-text p { font-size: 8px; color: #666; margin: 0; }
+        .header-filtro { float: right; text-align: right; font-size: 8px; color: #666; padding-top: 6px; }
+
+        h2 {
+            font-size: 10px;
+            background: #2c3e50;
+            color: white;
+            padding: 4px 8px;
+            margin: 10px 0 5px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 6px;
+            table-layout: fixed;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 3px 4px;
+            font-size: 8px;
+            word-wrap: break-word;
+            overflow: hidden;
+        }
+        th {
+            background: #ecf0f1;
+            font-weight: bold;
+            text-align: left;
+        }
+        td { text-align: center; }
+        td.label-cell { text-align: left; }
+        .highlight { background: #d5f5e3; }
+
+        .player-header {
+            background: #34495e;
+            color: white;
+            padding: 3px 6px;
+            font-size: 9px;
+            font-weight: bold;
+            margin: 8px 0 3px 0;
+        }
+        .badge-obj {
+            background: #3498db;
+            color: white;
+            padding: 1px 5px;
+            font-size: 7px;
+            float: right;
+        }
+
+        #footer-content {
+            text-align: center;
+            font-size: 7px;
+            color: #bbb;
+            border-top: 1px solid #e0e0e0;
+            padding-top: 3px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Footer -->
+<div id="footer-content">
+    Software Tomas Cielli &nbsp;&middot;&nbsp; Albatros Rugby Club &nbsp;&middot;&nbsp; Informe Grupal
+</div>
+
+<!-- Header -->
+<div class="header">
+    <div class="header-logo">
+        {% if logo_b64 %}
+        <img src="data:image/png;base64,{{ logo_b64 }}" alt="Logo">
+        {% endif %}
+    </div>
+    <div class="header-text">
+        <h1>Informe General del Plantel</h1>
+        <p>Albatros Rugby Club &mdash; La Plata</p>
+    </div>
+    <div class="header-filtro">
+        Filtro: <strong>{{ subtitulo }}</strong>
+    </div>
+</div>
+
+<!-- Datos por jugador -->
+{% if datos %}
+{% for item in datos %}
+<div class="player-header">
+    {{ item.jugador.apellido }}, {{ item.jugador.nombre }}
+    &nbsp;&mdash;&nbsp;
+    {{ item.jugador.posicion_actual or '' }} | {{ item.jugador.categoria_actual or '' }}
+    {% if item.jugador.objetivo %}
+    <span class="badge-obj">{{ item.jugador.objetivo }}</span>
+    {% endif %}
+</div>
+
+{% if item.mediciones %}
+<table>
+    <thead>
+        <tr>
+            <th style="width:16%">Dato</th>
+            {% for m in item.mediciones %}
+            <th style="width:{{ (84 / item.mediciones|length)|round|int }}%">{{ m.fecha }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="label-cell">Peso (kg)</td>
+            {% for m in item.mediciones %}
+            <td>{{ m.peso if m.peso is not none else '&mdash;' }}</td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td class="label-cell">Talla (cm)</td>
+            {% for m in item.mediciones %}
+            <td>{{ m.talla if m.talla is not none else '&mdash;' }}</td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td class="label-cell">&Sigma; Pliegues (mm)</td>
+            {% for m in item.mediciones %}
+            <td>{{ m.suma_pliegues if m.suma_pliegues is not none else '&mdash;' }}</td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td class="label-cell">% Grasa</td>
+            {% for m in item.mediciones %}
+            <td>{{ m.pct_grasa if m.pct_grasa is not none else '&mdash;' }}</td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td class="label-cell">Kg Grasa</td>
+            {% for m in item.mediciones %}
+            <td>{{ m.kg_grasa if m.kg_grasa is not none else '&mdash;' }}</td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td class="label-cell">Masa Muscular (kg)</td>
+            {% for m in item.mediciones %}
+            <td>{{ m.masa_muscular if m.masa_muscular is not none else '&mdash;' }}</td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td class="label-cell">Masa Osea (kg)</td>
+            {% for m in item.mediciones %}
+            <td>{{ m.masa_osea if m.masa_osea is not none else '&mdash;' }}</td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td class="label-cell">Masa Residual (kg)</td>
+            {% for m in item.mediciones %}
+            <td>{{ m.masa_residual if m.masa_residual is not none else '&mdash;' }}</td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td class="label-cell">Masa Piel (kg)</td>
+            {% for m in item.mediciones %}
+            <td>{{ m.masa_piel if m.masa_piel is not none else '&mdash;' }}</td>
+            {% endfor %}
+        </tr>
+    </tbody>
+</table>
+{% endif %}
+{% endfor %}
+{% else %}
+<p style="color:#999; text-align:center; margin-top:30px;">
+    No se encontraron jugadores con los filtros seleccionados.
+</p>
+{% endif %}
+
+<!-- Gráfico grupal -->
+{% if grafico_grupo %}
+<h2>Analisis Grupal &mdash; Ultima medicion por jugador</h2>
+<div style="text-align:center; margin-bottom:6px;">
+    <img src="data:image/png;base64,{{ grafico_grupo }}" style="width:100%; max-width:700px;" alt="Comparativa grupal">
+</div>
+{% endif %}
+
+<!-- Resumen estadístico -->
+{% if stats_grupo %}
+<h2>Resumen Estadistico</h2>
+<table>
+    <thead>
+        <tr>
+            <th style="width:28%">Jugador</th>
+            <th style="width:14%">Fecha</th>
+            <th style="width:14%">Peso (kg)</th>
+            <th style="width:14%">% Grasa</th>
+            <th style="width:15%">Masa Muscular (kg)</th>
+            <th style="width:15%">% Muscular</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for s in stats_grupo %}
+        <tr>
+            <td class="label-cell">{{ s.nombre }}</td>
+            <td>{{ s.fecha or '&mdash;' }}</td>
+            <td>{{ s.peso if s.peso is not none else '&mdash;' }}</td>
+            <td>{{ "%.1f"|format(s.pct_grasa) ~ "%" if s.pct_grasa is not none else '&mdash;' }}</td>
+            <td>{{ "%.1f"|format(s.masa_muscular) if s.masa_muscular is not none else '&mdash;' }}</td>
+            <td>{{ "%.1f"|format(s.pct_muscular) ~ "%" if s.pct_muscular is not none else '&mdash;' }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr class="highlight">
+            <th class="label-cell">Promedio</th>
+            <td></td>
+            {% set pesos_v = stats_grupo | selectattr("peso") | map(attribute="peso") | list %}
+            {% set grasa_v = stats_grupo | selectattr("pct_grasa") | map(attribute="pct_grasa") | list %}
+            {% set musc_v  = stats_grupo | selectattr("masa_muscular") | map(attribute="masa_muscular") | list %}
+            {% set pmusc_v = stats_grupo | selectattr("pct_muscular") | map(attribute="pct_muscular") | list %}
+            <th>{{ "%.1f"|format(pesos_v|sum / pesos_v|length) if pesos_v else '&mdash;' }}</th>
+            <th>{{ "%.1f"|format(grasa_v|sum / grasa_v|length) ~ "%" if grasa_v else '&mdash;' }}</th>
+            <th>{{ "%.1f"|format(musc_v|sum / musc_v|length) if musc_v else '&mdash;' }}</th>
+            <th>{{ "%.1f"|format(pmusc_v|sum / pmusc_v|length) ~ "%" if pmusc_v else '&mdash;' }}</th>
+        </tr>
+    </tfoot>
+</table>
+{% endif %}
+
+<!-- Fórmulas -->
+<div style="margin-top:8px; font-size:7px; color:#999; border-top:1px solid #eee; padding-top:4px;">
+    <strong>Formulas:</strong>
+    Adiposa: ISAK/Ross &amp; Kerr: (&Sigma;6&times;0.1051)&times;SC &nbsp;|&nbsp;
+    Muscular: Lee ISAK (perimetros corregidos) &nbsp;|&nbsp;
+    Osea: Rocha &nbsp;|&nbsp;
+    Residual: derivada (Peso &minus; otras 4) &nbsp;|&nbsp;
+    Piel: SC&times;1.05
+</div>
+
+</body>
+</html>
