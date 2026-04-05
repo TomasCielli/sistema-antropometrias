@@ -136,10 +136,10 @@
     </div>
 </div>
 
-<!-- Gráficos -->
+<!-- Gráficos de la medición -->
 {% if graficos.composicion or graficos.pliegues or graficos.perimetros %}
 <div class="card mb-4">
-    <div class="card-header">Gráficos</div>
+    <div class="card-header">Gráficos de esta medición</div>
     <div class="card-body">
         <div class="row text-center">
             {% if graficos.composicion %}
@@ -157,6 +157,48 @@
                 <img src="data:image/png;base64,{{ graficos.perimetros }}" class="img-fluid" alt="Perímetros">
             </div>
             {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Análisis Evolutivo -->
+{% if historico and historico|length >= 2 %}
+<div class="card mb-4">
+    <div class="card-header">Análisis Evolutivo — {{ jugador.apellido }}, {{ jugador.nombre }}</div>
+    <div class="card-body">
+        {% if graficos.evolucion %}
+        <img src="data:image/png;base64,{{ graficos.evolucion }}" class="img-fluid mb-3" alt="Evolución">
+        {% endif %}
+
+        <div class="table-responsive">
+            <table class="table table-sm table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Fecha</th>
+                        <th class="text-center">Peso (kg)</th>
+                        <th class="text-center">% Grasa</th>
+                        <th class="text-center">% Muscular</th>
+                        <th class="text-center">Masa Muscular (kg)</th>
+                        <th class="text-center">Σ 6 Pliegues (mm)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for h in historico %}
+                    <tr {% if h.id == antropometria.id %}class="table-info fw-bold"{% endif %}>
+                        <td>
+                            {{ h.fecha }}
+                            {% if h.id == antropometria.id %}<span class="badge bg-primary ms-1">actual</span>{% endif %}
+                        </td>
+                        <td class="text-center">{{ h.peso if h.peso is not none else '—' }}</td>
+                        <td class="text-center">{{ "%.1f"|format(h.pct_grasa) ~ "%" if h.pct_grasa is not none else '—' }}</td>
+                        <td class="text-center">{{ "%.1f"|format(h.pct_muscular) ~ "%" if h.pct_muscular is not none else '—' }}</td>
+                        <td class="text-center">{{ h.masa_muscular if h.masa_muscular is not none else '—' }}</td>
+                        <td class="text-center">{{ h.suma_6_pliegues if h.suma_6_pliegues is not none else '—' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

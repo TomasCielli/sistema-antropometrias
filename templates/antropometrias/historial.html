@@ -17,11 +17,15 @@
 </div>
 
 {% if antropometrias %}
-<form id="form-masivo" method="POST" action="{{ url_for('antropometrias.eliminar_masivo', id=jugador.id) }}">
+<form id="form-masivo" method="POST" action="{{ url_for('antropometrias.eliminar_masivo', id=jugador.id) }}" data-comparar-url="{{ url_for('antropometrias.comparar') }}">
     <div id="bulk-actions" class="mb-3 d-none" data-reveal>
         <button type="submit" class="btn btn-danger btn-sm"
                 onclick="return confirm('¿Seguro que querés eliminar las mediciones seleccionadas?')">
             Eliminar seleccionadas (<span id="count-selected">0</span>)
+        </button>
+        <button type="button" class="btn btn-outline-primary btn-sm ms-2" id="btn-comparar"
+                onclick="compararSeleccionadas()">
+            Comparar seleccionadas
         </button>
     </div>
 

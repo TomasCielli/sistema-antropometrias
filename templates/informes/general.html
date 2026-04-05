@@ -1,7 +1,13 @@
 {% extends "base.html" %}
 {% block title %}Informe General — Albatros Rugby Club{% endblock %}
 {% block content %}
-<h2 class="mb-3" data-reveal>Informe General</h2>
+<div class="d-flex justify-content-between align-items-center mb-3" data-reveal>
+    <h2 class="mb-0">Informe General</h2>
+    {% if datos %}
+    <a href="{{ url_for('informes.general_pdf', categoria=filtro_categoria, posicion=filtro_posicion, sexo=filtro_sexo) }}"
+       class="btn btn-danger">Descargar PDF</a>
+    {% endif %}
+</div>
 
 <form method="GET" action="{{ url_for('informes.general') }}" class="row g-2 mb-4 surface-card" data-reveal>
     <div class="col-md-3">
@@ -127,6 +133,64 @@
 <div class="empty-state" data-reveal>
     No se encontraron jugadores con los filtros seleccionados.
 </div>
+{% endif %}
+
+<!-- Análisis Grupal -->
+{% if grafico_grupo %}
+<div class="card mt-4 mb-4" data-reveal>
+    <div class="card-header">Análisis Grupal — Última medición por jugador</div>
+    <div class="card-body text-center">
+        <img src="data:image/png;base64,{{ grafico_grupo }}" class="img-fluid" alt="Comparativa grupal">
+    </div>
+</div>
+
+{% if stats_grupo %}
+<div class="card mb-4" data-reveal>
+    <div class="card-header">Resumen estadístico del grupo</div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Jugador</th>
+                        <th class="text-center">Fecha</th>
+                        <th class="text-center">Peso (kg)</th>
+                        <th class="text-center">% Grasa</th>
+                        <th class="text-center">Masa Muscular (kg)</th>
+                        <th class="text-center">% Muscular</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in stats_grupo %}
+                    <tr>
+                        <td>{{ s.nombre }}</td>
+                        <td class="text-center">{{ s.fecha or '—' }}</td>
+                        <td class="text-center">{{ s.peso if s.peso is not none else '—' }}</td>
+                        <td class="text-center">{{ "%.1f"|format(s.pct_grasa) ~ "%" if s.pct_grasa is not none else '—' }}</td>
+                        <td class="text-center">{{ "%.1f"|format(s.masa_muscular) if s.masa_muscular is not none else '—' }}</td>
+                        <td class="text-center">{{ "%.1f"|format(s.pct_muscular) ~ "%" if s.pct_muscular is not none else '—' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot class="table-light">
+                    <tr>
+                        <th>Promedio</th>
+                        <td></td>
+                        {% set pesos_v = stats_grupo | selectattr("peso") | map(attribute="peso") | list %}
+                        {% set grasa_v = stats_grupo | selectattr("pct_grasa") | map(attribute="pct_grasa") | list %}
+                        {% set musc_v  = stats_grupo | selectattr("masa_muscular") | map(attribute="masa_muscular") | list %}
+                        {% set pmusc_v = stats_grupo | selectattr("pct_muscular") | map(attribute="pct_muscular") | list %}
+                        <td class="text-center fw-bold">{{ "%.1f"|format(pesos_v|sum / pesos_v|length) if pesos_v else '—' }}</td>
+                        <td class="text-center fw-bold">{{ "%.1f"|format(grasa_v|sum / grasa_v|length) ~ "%" if grasa_v else '—' }}</td>
+                        <td class="text-center fw-bold">{{ "%.1f"|format(musc_v|sum / musc_v|length) if musc_v else '—' }}</td>
+                        <td class="text-center fw-bold">{{ "%.1f"|format(pmusc_v|sum / pmusc_v|length) ~ "%" if pmusc_v else '—' }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endif %}
 
 <div class="card mt-4 mb-5" data-reveal>

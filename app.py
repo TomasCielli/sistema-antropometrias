@@ -8,15 +8,25 @@ def create_app():
 
     crear_base()
 
+    from routes.auth import auth_bp, login_required
     from routes.jugadores import jugadores_bp
     from routes.antropometrias import antropometrias_bp
     from routes.informes import informes_bp
     from routes.datos import datos_bp
 
+    app.register_blueprint(auth_bp)
     app.register_blueprint(jugadores_bp)
     app.register_blueprint(antropometrias_bp)
     app.register_blueprint(informes_bp)
     app.register_blueprint(datos_bp)
+
+    # Protect all routes except auth and static
+    @app.before_request
+    def require_login():
+        from flask import request, session, redirect, url_for
+        allowed = {"auth.login", "static"}
+        if request.endpoint and request.endpoint not in allowed and not session.get("logged_in"):
+            return redirect(url_for("auth.login", next=request.url))
 
     @app.route("/")
     def index():

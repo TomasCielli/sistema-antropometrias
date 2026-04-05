@@ -51,19 +51,29 @@ def antro(jid, fecha, peso, talla, posicion, categoria, sexo_m=True, variacion=0
         peso + v, talla,                         # peso, talla_corporal
         talla * 0.52,                             # talla_sentado
         42 + v * 0.1 if is_m else 38 + v * 0.1,  # biacromial
-        30 + v * 0.05, 22 + v * 0.03,            # torax_transverso, torax_anteroposterior
-        28 + v * 0.04,                             # bi_iliocrestideo
-        7.0 + v * 0.02, 10.0 + v * 0.03,         # humeral, femoral
-        57, 34 + v * 0.2, 37 + v * 0.2,          # cabeza, brazo_relajado, brazo_flexionado
-        28 + v * 0.1,                              # antebrazo
-        100 + v * 0.3, 84 + v * 0.5,             # torax_mesoesternal, cintura
-        100 + v * 0.2,                             # cadera
-        58 + v * 0.3, 54 + v * 0.2,              # muslo_maximo, muslo_medial
-        38 + v * 0.1,                              # pantorrilla_maxima
-        12 + v * 0.5, 14 + v * 0.3,              # triceps, subescapular
-        10 + v * 0.4, 18 + v * 0.6,              # supraespinal, abdominal
-        16 + v * 0.4, 10 + v * 0.2,              # muslo_medial_pliegue, pantorrilla_pliegue
-        6 + v * 0.2, 14 + v * 0.5,               # biceps, cresta_iliaca
+        30 + v * 0.05 if is_m else 26 + v * 0.04,  # torax_transverso
+        22 + v * 0.03 if is_m else 19 + v * 0.03, # torax_anteroposterior
+        28 + v * 0.04 if is_m else 26 + v * 0.04, # bi_iliocrestideo
+        7.0 + v * 0.02 if is_m else 6.0 + v * 0.02, # humeral
+        10.0 + v * 0.03 if is_m else 8.5 + v * 0.02, # femoral
+        57 if is_m else 54,                                              # cabeza
+        34 + v * 0.2 if is_m else 27 + v * 0.15,                    # brazo_relajado
+        37 + v * 0.2 if is_m else 29 + v * 0.15,                    # brazo_flexionado
+        28 + v * 0.1 if is_m else 23 + v * 0.08,                    # antebrazo
+        100 + v * 0.3 if is_m else 88 + v * 0.25,                   # torax_mesoesternal
+        84 + v * 0.5 if is_m else 72 + v * 0.4,                     # cintura
+        100 + v * 0.2 if is_m else 96 + v * 0.3,                    # cadera
+        58 + v * 0.3 if is_m else 51 + v * 0.25,                    # muslo_maximo
+        54 + v * 0.2 if is_m else 47 + v * 0.2,                     # muslo_medial
+        38 + v * 0.1 if is_m else 35 + v * 0.08,                    # pantorrilla_maxima
+        12 + v * 0.5 if is_m else 18 + v * 0.4,    # triceps
+        14 + v * 0.3 if is_m else 13 + v * 0.3,  # subescapular
+        10 + v * 0.4 if is_m else 14 + v * 0.4,  # supraespinal
+        18 + v * 0.6 if is_m else 20 + v * 0.5,  # abdominal
+        16 + v * 0.4 if is_m else 22 + v * 0.4,  # muslo_medial_pliegue
+        10 + v * 0.2 if is_m else 14 + v * 0.2,  # pantorrilla_pliegue
+        6 + v * 0.2 if is_m else 10 + v * 0.2,   # biceps
+        14 + v * 0.5 if is_m else 13 + v * 0.4,  # cresta_iliaca
     )
 
 campos_antro = """jugador_id, fecha, posicion, categoria, peso, talla_corporal, talla_sentado,
