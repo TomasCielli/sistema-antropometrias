@@ -80,7 +80,7 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>Masa Adiposa <small class="text-muted">(ISAK / Ross & Kerr)</small></td>
+                        <td>Masa Adiposa <small class="text-muted">(Carter-Yuhász)</small></td>
                         <td class="text-center">{{ comp.masa_adiposa if comp.masa_adiposa is not none else '—' }}</td>
                         <td class="text-center">{{ comp.pct_grasa if comp.pct_grasa is not none else '—' }}%</td>
                     </tr>
@@ -210,11 +210,11 @@
         <strong>Fórmulas utilizadas:</strong>
         <ul class="mb-0">
             <li><strong>Superficie Corporal</strong> — Du Bois: SC = 0.007184 × peso⁰·⁴²⁵ × talla⁰·⁷²⁵</li>
-            <li><strong>Masa Adiposa</strong> — ISAK / Ross & Kerr: (Σ6 × 0.1051) × SC</li>
-            <li><strong>Masa Muscular</strong> — Lee adaptada ISAK (perímetros corregidos, raza: caucásico)</li>
-            <li><strong>Masa Ósea</strong> — Rocha: 3.02 × (talla² × húmero × fémur × 400)⁰·⁷¹²</li>
-            <li><strong>Masa Residual</strong> — Hombres: peso × 0.241 | Mujeres: peso × 0.209</li>
-            <li><strong>Masa de Piel</strong> — SC × 1.05</li>
+            <li><strong>Masa Adiposa</strong> — Carter-Yuhász: (Σ6 × 0.1051 + 2.585) × SC</li>
+            <li><strong>Masa Muscular</strong> — Lee et al. (2000) adaptada ISAK (perímetros corregidos con muslo medial)</li>
+            <li><strong>Masa Ósea</strong> — Rocha (1975)</li>
+            <li><strong>Masa Residual</strong> — Derivada (Peso − otras 4 masas)</li>
+            <li><strong>Masa de Piel</strong> — Kerr (1991): SC × TSK × 1.05 (TSK: H=2.07mm, M=1.96mm)</li>
         </ul>
     </div>
 </div>
