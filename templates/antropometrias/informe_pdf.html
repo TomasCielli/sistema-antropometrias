@@ -217,7 +217,7 @@
     </thead>
     <tbody>
         <tr>
-            <td class="label-cell">Masa Adiposa <small>(ISAK / Ross &amp; Kerr)</small></td>
+            <td class="label-cell">Masa Adiposa <small>(Carter-Yuh&aacute;sz)</small></td>
             <td>{{ comp.masa_adiposa if comp.masa_adiposa is not none else '—' }}</td>
             <td>{{ comp.pct_grasa if comp.pct_grasa is not none else '—' }}%</td>
         </tr>
@@ -318,11 +318,11 @@
 <div style="margin-top:8px; font-size:7.5px; color:#999; border-top:1px solid #eee; padding-top:5px;">
     <strong>Fórmulas:</strong>
     SC: Du Bois &nbsp;|&nbsp;
-    Adiposa: ISAK/Ross &amp; Kerr: (Σ6×0.1051)×SC &nbsp;|&nbsp;
-    Muscular: Lee ISAK (perímetros corregidos, caucásico) &nbsp;|&nbsp;
+    Adiposa: Carter-Yuhász: (Σ6×0.1051 + 2.585)×SC &nbsp;|&nbsp;
+    Muscular: Lee ISAK (perímetros corregidos con muslo medial) &nbsp;|&nbsp;
     Ósea: Rocha &nbsp;|&nbsp;
     Residual: derivada (Peso − otras 4) &nbsp;|&nbsp;
-    Piel: SC×1.05
+    Piel: Kerr (1991): SC×TSK×1.05 (TSK: H=2.07mm, M=1.96mm)
 </div>
 
 </body>
