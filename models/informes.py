@@ -51,16 +51,16 @@ def calcular_superficie_corporal(peso, talla_cm):
 # --- MASA ADIPOSA (ISAK / Ross & Kerr) ---
 
 def calcular_masa_adiposa(a, peso, talla_cm):
-    """ISAK/Ross & Kerr adipose mass.
+    """Carter-Yuhász adipose mass (commonly used in ISAK practice).
     Σ6 = triceps + subescapular + supraespinal + abdominal + muslo + pantorrilla
-    Masa adiposa (kg) = (Σ6 * 0.1051) * SC
+    Masa adiposa (kg) = (Σ6 * 0.1051 + 2.585) * SC
     % grasa = (masa adiposa / peso) * 100
     """
     suma6 = calcular_suma_6_pliegues(a)
     sc = calcular_superficie_corporal(peso, talla_cm)
     if suma6 is None or sc is None or peso is None or peso == 0:
         return None, None
-    masa_adiposa = round((suma6 * 0.1051) * sc, 2)
+    masa_adiposa = round((suma6 * 0.1051 + 2.585) * sc, 2)
     pct_grasa = round((masa_adiposa / peso) * 100, 2)
     return masa_adiposa, pct_grasa
 
@@ -68,14 +68,14 @@ def calcular_masa_adiposa(a, peso, talla_cm):
 # --- MASA MUSCULAR (Lee adaptada ISAK) ---
 
 def calcular_masa_muscular(a, talla_cm, sexo, edad):
-    """Lee formula adapted ISAK.
+    """Lee et al. (2000) adapted ISAK.
     Corrected perimeters:
         brazo_corr = brazo_relajado - (π * triceps / 10)
-        muslo_corr = muslo_maximo - (π * muslo_medial_pliegue / 10)
+        muslo_corr = muslo_medial - (π * muslo_medial_pliegue / 10)
         pantorrilla_corr = pantorrilla_maxima - (π * pantorrilla_pliegue / 10)
-    MM = (altura * 0.00744 * brazo_corr²) +
-         (altura * 0.00088 * muslo_corr²) +
-         (altura * 0.00441 * pantorrilla_corr²) +
+    MM = (altura_m * 0.00744 * brazo_corr²) +
+         (altura_m * 0.00088 * muslo_corr²) +
+         (altura_m * 0.00441 * pantorrilla_corr²) +
          (2.4 * sexo_val) - (0.048 * edad) + raza + 7.8
     sexo: masculino=1, femenino=0 | raza: caucásico=0 (default)
     """
@@ -84,7 +84,7 @@ def calcular_masa_muscular(a, talla_cm, sexo, edad):
 
     brazo = a.get("brazo_relajado")
     triceps = a.get("triceps")
-    muslo = a.get("muslo_maximo")
+    muslo = a.get("muslo_medial")
     muslo_pl = a.get("muslo_medial_pliegue")
     panto = a.get("pantorrilla_maxima")
     panto_pl = a.get("pantorrilla_pliegue")
@@ -136,11 +136,18 @@ def calcular_masa_residual(peso, sexo):
 
 # --- MASA DE PIEL ---
 
-def calcular_masa_piel(sc):
-    """Masa piel = SC * 1.05"""
+def calcular_masa_piel(sc, sexo=None):
+    """Kerr (1991): Masa piel = SA × TSK × densidad.
+    TSK (grosor de piel): 2.07 mm hombres, 1.96 mm mujeres.
+    Densidad: 1.05 g/cm³.
+    Factor combinado: hombres SC × 2.1735, mujeres SC × 2.058.
+    """
     if sc is None:
         return None
-    return round(sc * 1.05, 2)
+    if sexo == "Masculino":
+        return round(sc * 2.1735, 2)
+    else:
+        return round(sc * 2.058, 2)
 
 
 # --- COMPOSICIÓN COMPLETA (para informe individual) ---
@@ -165,7 +172,7 @@ def calcular_composicion_completa(jugador, antropometria):
     masa_adiposa, pct_grasa = calcular_masa_adiposa(antropometria, peso, talla)
     masa_muscular = calcular_masa_muscular(antropometria, talla, sexo, edad)
     masa_osea = calcular_masa_osea(talla, antropometria.get("femoral"), antropometria.get("humeral"))
-    masa_piel = calcular_masa_piel(sc)
+    masa_piel = calcular_masa_piel(sc, sexo)
 
     # Residual = remainder so model always closes to 100%
     masa_residual = None
