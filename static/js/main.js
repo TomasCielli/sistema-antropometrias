@@ -78,6 +78,45 @@ document.addEventListener("DOMContentLoaded", function () {
         if (filterSexo) filterSexo.addEventListener("change", applyFilters);
     }
 
+    const refTableBody = document.getElementById("referencias-table-body");
+    const refSearchInput = document.getElementById("ref-search-input");
+    const refFilterDeporte = document.getElementById("ref-filter-deporte");
+    const refFilterCategoria = document.getElementById("ref-filter-categoria");
+    const refFilterSexo = document.getElementById("ref-filter-sexo");
+
+    if (refTableBody) {
+        function applyReferenceFilters() {
+            const searchText = (refSearchInput ? refSearchInput.value : "").toLowerCase().trim();
+            const deporteText = (refFilterDeporte ? refFilterDeporte.value : "").toLowerCase().trim();
+            const categoriaText = (refFilterCategoria ? refFilterCategoria.value : "").toLowerCase().trim();
+            const sexoValue = refFilterSexo ? refFilterSexo.value : "";
+
+            refTableBody.querySelectorAll("tr").forEach(function (row) {
+                const nombre = (row.dataset.nombre || "").toLowerCase();
+                const deporte = (row.dataset.deporte || "").toLowerCase();
+                const categoria = (row.dataset.categoria || "").toLowerCase();
+                const sexo = row.dataset.sexo || "";
+
+                const matchesSearch =
+                    !searchText ||
+                    nombre.includes(searchText) ||
+                    deporte.includes(searchText) ||
+                    categoria.includes(searchText);
+                const matchesDeporte = !deporteText || deporte.includes(deporteText);
+                const matchesCategoria = !categoriaText || categoria.includes(categoriaText);
+                const matchesSexo = !sexoValue || sexo === sexoValue;
+
+                row.style.display =
+                    matchesSearch && matchesDeporte && matchesCategoria && matchesSexo ? "" : "none";
+            });
+        }
+
+        if (refSearchInput) refSearchInput.addEventListener("input", applyReferenceFilters);
+        if (refFilterDeporte) refFilterDeporte.addEventListener("input", applyReferenceFilters);
+        if (refFilterCategoria) refFilterCategoria.addEventListener("input", applyReferenceFilters);
+        if (refFilterSexo) refFilterSexo.addEventListener("change", applyReferenceFilters);
+    }
+
     // Bulk selection (checkboxes)
     const selectAll = document.getElementById("select-all");
     const bulkActions = document.getElementById("bulk-actions");

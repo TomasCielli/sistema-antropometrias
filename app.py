@@ -13,12 +13,14 @@ def create_app():
     from routes.antropometrias import antropometrias_bp
     from routes.informes import informes_bp
     from routes.datos import datos_bp
+    from routes.referencias import referencias_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(jugadores_bp)
     app.register_blueprint(antropometrias_bp)
     app.register_blueprint(informes_bp)
     app.register_blueprint(datos_bp)
+    app.register_blueprint(referencias_bp)
 
     # Protect all routes except auth and static
     @app.before_request

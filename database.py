@@ -66,6 +66,27 @@ def crear_base():
     )
     """)
 
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS referencias_antropometricas (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT NOT NULL,
+        deporte TEXT NOT NULL,
+        categoria TEXT,
+        posicion TEXT,
+        sexo TEXT,
+        descripcion TEXT,
+        peso REAL,
+        pct_grasa REAL,
+        masa_adiposa REAL,
+        pct_muscular REAL,
+        masa_muscular REAL,
+        masa_osea REAL,
+        masa_residual REAL,
+        masa_piel REAL,
+        creado_en DATE DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+
     # Add new columns if they don't exist (migration for existing DBs)
     try:
         cursor.execute("ALTER TABLE jugadores ADD COLUMN telefono TEXT")
@@ -83,6 +104,11 @@ def crear_base():
     cursor.execute("""
     CREATE INDEX IF NOT EXISTS idx_antropometria_jugador_fecha
     ON antropometrias (jugador_id, fecha)
+    """)
+
+    cursor.execute("""
+    CREATE INDEX IF NOT EXISTS idx_referencias_deporte_categoria
+    ON referencias_antropometricas (deporte, categoria)
     """)
 
     conn.commit()

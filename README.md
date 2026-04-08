@@ -76,6 +76,14 @@ Cada jugador puede tener múltiples estudios antropométricos, cada uno identifi
 
 La categoría y posición se guardan como snapshot al momento de la medición (no cambian si luego se edita el jugador). Al crear una nueva medición, la posición y categoría actuales del jugador se actualizan automáticamente.
 
+### Tablas de Referencia
+
+Se pueden cargar perfiles de referencia por deporte (por ejemplo Rugby), categoría, posición y sexo para comparar mediciones reales contra una referencia objetivo.
+
+- Gestión completa: alta, edición y baja desde la sección **Referencias**.
+- Comparación flexible: permite comparar múltiples mediciones entre sí o una medición + una referencia.
+- Import / export: la hoja **Referencias** se exporta automáticamente y su importación es opcional.
+
 ### Informe General
 
 Reporte evolutivo del club que muestra las últimas 3 antropometrías de cada jugador con los siguientes cálculos:

@@ -58,6 +58,8 @@
                            class="btn btn-sm btn-outline-success">Informe</a>
                         <a href="{{ url_for('antropometrias.editar', id=a.id) }}"
                            class="btn btn-sm btn-outline-secondary">Editar</a>
+                                <a href="{{ url_for('referencias.nueva_desde_antropometria', id=a.id) }}"
+                                    class="btn btn-sm btn-outline-primary">Crear ref.</a>
                         <form method="POST" action="{{ url_for('antropometrias.eliminar', id=a.id) }}"
                               class="d-inline"
                               onsubmit="return confirmarEliminar('{{ a.fecha }}', 'medicion')">

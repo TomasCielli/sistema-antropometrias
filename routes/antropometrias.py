@@ -15,6 +15,7 @@ from models.graficos import (
     grafico_composicion_pie, grafico_pliegues_bar, grafico_perimetros_bar,
     grafico_evolucion, grafico_comparacion_componentes,
 )
+from models.referencias import obtener_referencia_por_id, obtener_referencias
 
 antropometrias_bp = Blueprint("antropometrias", __name__)
 
@@ -306,12 +307,50 @@ def eliminar_masivo(id):
 def comparar():
     ids_str = request.args.get("ids", "")
     ids = [int(i) for i in ids_str.split(",") if i.strip().isdigit()]
+    referencia_id = request.args.get("referencia_id", "").strip()
 
-    if len(ids) < 2:
-        flash("Seleccioná al menos 2 mediciones para comparar", "warning")
+    referencias = obtener_referencias()
+    referencia = None
+    if referencia_id.isdigit():
+        referencia = obtener_referencia_por_id(int(referencia_id))
+
+    if len(ids) < 2 and not (len(ids) >= 1 and referencia):
+        flash("Seleccioná al menos 2 mediciones o 1 medición + una referencia", "warning")
         return redirect(url_for("jugadores.listar"))
 
     items = []
+
+    if referencia:
+        items.append({
+            "antropometria": {
+                "id": None,
+                "fecha": None,
+                "peso": referencia.get("peso"),
+                "posicion": referencia.get("posicion"),
+                "categoria": referencia.get("categoria"),
+            },
+            "jugador": {
+                "apellido": "Referencia",
+                "nombre": referencia.get("nombre"),
+                "sexo": referencia.get("sexo") or "—",
+            },
+            "edad": None,
+            "comp": {
+                "pct_grasa": referencia.get("pct_grasa"),
+                "masa_adiposa": referencia.get("masa_adiposa"),
+                "pct_muscular": referencia.get("pct_muscular"),
+                "masa_muscular": referencia.get("masa_muscular"),
+                "masa_osea": referencia.get("masa_osea"),
+                "masa_residual": referencia.get("masa_residual"),
+                "masa_piel": referencia.get("masa_piel"),
+                "suma_6_pliegues": None,
+                "suma_8_pliegues": None,
+                "superficie_corporal": None,
+            },
+            "label": f"Referencia: {referencia['nombre']}",
+            "es_referencia": True,
+        })
+
     for aid in ids:
         a = obtener_antropometria_por_id(aid)
         if not a:
@@ -325,6 +364,7 @@ def comparar():
             "edad": edad,
             "comp": comp,
             "label": f"{a['fecha']} ({jugador['apellido']})",
+            "es_referencia": False,
         })
 
     if len(items) < 2:
@@ -355,5 +395,8 @@ def comparar():
     return render_template("antropometrias/comparar.html",
                            items=items,
                            grafico=grafico,
+                           referencias=referencias,
+                           referencia_id_actual=referencia.get("id") if referencia else None,
+                           ids_str=ids_str,
                            secciones=SECCIONES,
                            labels=LABELS)

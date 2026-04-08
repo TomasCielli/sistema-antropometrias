@@ -10,7 +10,8 @@
     <div class="card-body">
         <h5 class="card-title">Subir archivo Excel</h5>
         <p class="text-muted">
-            El archivo debe ser <code>.xlsx</code> con dos hojas: <strong>Jugadores</strong> y <strong>Antropometrias</strong>.
+            El archivo debe ser <code>.xlsx</code> con dos hojas obligatorias: <strong>Jugadores</strong> y <strong>Antropometrias</strong>.
+            Opcionalmente puede incluir una tercera hoja: <strong>Referencias</strong>.
             Si un jugador del archivo ya existe, se te mostrará la diferencia para que puedas elegir qué versión conservar.
             Las antropometrías con misma fecha y jugador serán omitidas.
         </p>
@@ -46,6 +47,12 @@
         </p>
         <p class="small text-muted mb-0">
             <strong>Tip:</strong> Usá <a href="{{ url_for('datos.exportar') }}">Exportar</a> para generar un archivo con el formato correcto.
+        </p>
+        <h6 class="mt-3">Hoja "Referencias" (opcional)</h6>
+        <p class="small text-muted mb-0">
+            Columnas: id, nombre, deporte, categoria, posicion, sexo, descripcion,
+            peso, pct_grasa, masa_adiposa, pct_muscular, masa_muscular, masa_osea,
+            masa_residual, masa_piel, creado_en
         </p>
     </div>
 </div>

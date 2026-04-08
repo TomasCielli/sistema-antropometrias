@@ -7,6 +7,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from openpyxl import Workbook, load_workbook
 from database import get_connection
 from models.antropometrias import CAMPOS_NUMERICOS, LABELS
+from models.referencias import CAMPOS_NUMERICOS_REFERENCIA
 
 datos_bp = Blueprint("datos", __name__)
 
@@ -76,6 +77,17 @@ def exportar():
         for campo in CAMPOS_NUMERICOS:
             fila.append(row[campo])
         ws_ant.append(fila)
+
+    # Sheet 3: Referencias (optional on import, always present on export)
+    ws_ref = wb.create_sheet("Referencias")
+    ref_headers = [
+        "id", "nombre", "deporte", "categoria", "posicion", "sexo", "descripcion",
+    ] + CAMPOS_NUMERICOS_REFERENCIA + ["creado_en"]
+    ws_ref.append(ref_headers)
+
+    cursor.execute("SELECT * FROM referencias_antropometricas ORDER BY deporte, categoria, nombre")
+    for row in cursor.fetchall():
+        ws_ref.append([row[h] for h in ref_headers])
 
     conn.close()
 
@@ -270,13 +282,72 @@ def procesar_importacion():
         if fila_valida:
             antropometrias_pendientes.append(campos_validos)
 
+    # --- Parse Referencias sheet (optional) ---
+    referencias_pendientes = []
+    errores_ref = []
+    if "Referencias" in wb.sheetnames:
+        ws_ref = wb["Referencias"]
+        ref_headers = [cell.value for cell in ws_ref[1]]
+
+        for fila_num, row in enumerate(ws_ref.iter_rows(min_row=2, values_only=True), start=2):
+            if not any(row):
+                continue
+
+            datos = dict(zip(ref_headers, row))
+            nombre = _normalizar(datos.get("nombre"))
+            deporte = _normalizar(datos.get("deporte"))
+
+            if not nombre:
+                errores_ref.append(f"Referencias fila {fila_num}: campo \"nombre\" — obligatorio vacío")
+                continue
+            if not deporte:
+                errores_ref.append(f"Referencias fila {fila_num}: campo \"deporte\" — obligatorio vacío")
+                continue
+
+            ref_valida = {
+                "nombre": nombre,
+                "deporte": deporte,
+                "categoria": _normalizar(datos.get("categoria")) or None,
+                "posicion": _normalizar(datos.get("posicion")) or None,
+                "sexo": _normalizar(datos.get("sexo")) or None,
+                "descripcion": _normalizar(datos.get("descripcion")) or None,
+            }
+
+            fila_valida = True
+            for campo in CAMPOS_NUMERICOS_REFERENCIA:
+                val = datos.get(campo)
+                if val is None or val == "" or val == "—":
+                    ref_valida[campo] = None
+                    continue
+                try:
+                    val_float = float(val)
+                    if val_float < 0:
+                        errores_ref.append(
+                            f"Referencias fila {fila_num}: campo \"{campo}\" — el valor no puede ser negativo"
+                        )
+                        fila_valida = False
+                        break
+                    ref_valida[campo] = val_float
+                except (ValueError, TypeError):
+                    errores_ref.append(
+                        f"Referencias fila {fila_num}: campo \"{campo}\" — se esperaba un número, se recibió '{val}'"
+                    )
+                    fila_valida = False
+                    break
+
+            if fila_valida:
+                referencias_pendientes.append(ref_valida)
+
     conn.close()
+
+    errores_ant.extend(errores_ref)
 
     # --- If conflicts exist → save to temp file, show conflict resolution page ---
     if conflictos:
         temp_data = {
             "nuevos": nuevos,
             "antropometrias": antropometrias_pendientes,
+            "referencias": referencias_pendientes,
             "errores_jug": errores_jug,
             "errores_ant": errores_ant,
         }
@@ -293,7 +364,7 @@ def procesar_importacion():
                                total_antro=len(antropometrias_pendientes))
 
     # --- No conflicts → process directly ---
-    resultados = _procesar_datos(nuevos, {}, antropometrias_pendientes)
+    resultados = _procesar_datos(nuevos, {}, antropometrias_pendientes, referencias_pendientes)
     _flash_resultado(resultados, errores_jug, errores_ant)
     return redirect(url_for("datos.importar"))
 
@@ -313,6 +384,7 @@ def resolver_conflictos():
 
     nuevos = temp_data["nuevos"]
     antropometrias_pendientes = temp_data["antropometrias"]
+    referencias_pendientes = temp_data.get("referencias", [])
     errores_jug = temp_data["errores_jug"]
     errores_ant = temp_data["errores_ant"]
 
@@ -323,12 +395,12 @@ def resolver_conflictos():
             dni = key[len("decision_"):]
             decisiones[dni] = val
 
-    resultados = _procesar_datos(nuevos, decisiones, antropometrias_pendientes)
+    resultados = _procesar_datos(nuevos, decisiones, antropometrias_pendientes, referencias_pendientes)
     _flash_resultado(resultados, errores_jug, errores_ant)
     return redirect(url_for("datos.importar"))
 
 
-def _procesar_datos(nuevos, decisiones, antropometrias_pendientes):
+def _procesar_datos(nuevos, decisiones, antropometrias_pendientes, referencias_pendientes):
     """Insert nuevos, apply decisions for conflicts, insert anthropometries."""
     conn = get_connection()
     cursor = conn.cursor()
@@ -412,6 +484,37 @@ def _procesar_datos(nuevos, decisiones, antropometrias_pendientes):
         except Exception:
             ant_errores += 1
 
+    # Process references (skip duplicates by nombre+deporte+categoria+sexo)
+    ref_insertadas = 0
+    ref_omitidas = 0
+    ref_errores = 0
+
+    for r in referencias_pendientes:
+        cursor.execute(
+            """
+            SELECT 1
+            FROM referencias_antropometricas
+            WHERE LOWER(nombre) = LOWER(?)
+              AND LOWER(deporte) = LOWER(?)
+              AND LOWER(COALESCE(categoria, '')) = LOWER(COALESCE(?, ''))
+              AND LOWER(COALESCE(sexo, '')) = LOWER(COALESCE(?, ''))
+            """,
+            (r["nombre"], r["deporte"], r.get("categoria"), r.get("sexo"))
+        )
+        if cursor.fetchone():
+            ref_omitidas += 1
+            continue
+
+        columnas = list(r.keys())
+        valores = list(r.values())
+        placeholders = ", ".join(["?"] * len(valores))
+        sql = f"INSERT INTO referencias_antropometricas ({', '.join(columnas)}) VALUES ({placeholders})"
+        try:
+            cursor.execute(sql, valores)
+            ref_insertadas += 1
+        except Exception:
+            ref_errores += 1
+
     conn.commit()
     conn.close()
 
@@ -422,6 +525,9 @@ def _procesar_datos(nuevos, decisiones, antropometrias_pendientes):
         "ant_insertadas": ant_insertadas,
         "ant_omitidas": ant_omitidas,
         "ant_errores": ant_errores,
+        "ref_insertadas": ref_insertadas,
+        "ref_omitidas": ref_omitidas,
+        "ref_errores": ref_errores,
     }
 
 
@@ -436,11 +542,17 @@ def _flash_resultado(res, errores_jug, errores_ant):
         f"Antropometrías: {res['ant_insertadas']} insertadas, "
         f"{res['ant_omitidas']} omitidas."
     )
+    partes.append(
+        f"Referencias: {res['ref_insertadas']} insertadas, "
+        f"{res['ref_omitidas']} omitidas."
+    )
     if res["ant_errores"] > 0:
         partes.append(f"{res['ant_errores']} filas con errores.")
+    if res["ref_errores"] > 0:
+        partes.append(f"{res['ref_errores']} referencias con errores.")
 
     todos_errores = errores_jug + errores_ant
-    tiene_errores = res["ant_errores"] > 0 or todos_errores
+    tiene_errores = res["ant_errores"] > 0 or res["ref_errores"] > 0 or todos_errores
 
     flash(" ".join(partes), "warning" if tiene_errores else "success")
 

@@ -7,12 +7,38 @@
         <h2>Comparación de Mediciones</h2>
         <p class="text-muted mb-0">
             {% for item in items %}
-                {{ item.jugador.apellido }}, {{ item.jugador.nombre }} ({{ item.antropometria.fecha }})
+                {% if item.es_referencia %}
+                    Referencia: {{ item.jugador.nombre }}
+                {% else %}
+                    {{ item.jugador.apellido }}, {{ item.jugador.nombre }} ({{ item.antropometria.fecha }})
+                {% endif %}
                 {% if not loop.last %} &nbsp;vs&nbsp; {% endif %}
             {% endfor %}
         </p>
     </div>
     <a href="javascript:history.back()" class="btn btn-outline-secondary">Volver</a>
+</div>
+
+<div class="card mb-4" data-reveal>
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('antropometrias.comparar') }}" class="row g-3 align-items-end">
+            <input type="hidden" name="ids" value="{{ ids_str }}">
+            <div class="col-md-8">
+                <label for="referencia_id" class="form-label">Tabla de referencia (opcional)</label>
+                <select class="form-select" id="referencia_id" name="referencia_id">
+                    <option value="">Sin referencia</option>
+                    {% for r in referencias %}
+                    <option value="{{ r.id }}" {% if referencia_id_actual == r.id %}selected{% endif %}>
+                        {{ r.deporte }}{% if r.categoria %} - {{ r.categoria }}{% endif %}: {{ r.nombre }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary w-100">Aplicar referencia</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <!-- Gráfico comparativo -->
@@ -36,8 +62,13 @@
                         <th>Indicador</th>
                         {% for item in items %}
                         <th class="text-center">
-                            {{ item.jugador.apellido }}<br>
-                            <small class="fw-normal">{{ item.antropometria.fecha }}</small>
+                            {% if item.es_referencia %}
+                                Referencia<br>
+                                <small class="fw-normal">{{ item.jugador.nombre }}</small>
+                            {% else %}
+                                {{ item.jugador.apellido }}<br>
+                                <small class="fw-normal">{{ item.antropometria.fecha }}</small>
+                            {% endif %}
                             {% if item.deltas is none %}<br><span class="badge bg-secondary">referencia</span>{% endif %}
                         </th>
                         {% endfor %}
@@ -96,7 +127,11 @@
         <div class="row">
             {% for item in items %}
             <div class="col-md-{{ (12 // items|length) }}">
-                <h6 class="fw-bold">{{ item.jugador.apellido }}, {{ item.jugador.nombre }} — {{ item.antropometria.fecha }}</h6>
+                {% if item.es_referencia %}
+                    <h6 class="fw-bold">Referencia — {{ item.jugador.nombre }}</h6>
+                {% else %}
+                    <h6 class="fw-bold">{{ item.jugador.apellido }}, {{ item.jugador.nombre }} — {{ item.antropometria.fecha }}</h6>
+                {% endif %}
                 <ul class="list-unstyled small text-muted">
                     <li><strong>Sexo:</strong> {{ item.jugador.sexo }}</li>
                     <li><strong>Edad:</strong> {{ item.edad if item.edad is not none else '—' }} años</li>
@@ -107,8 +142,12 @@
                     <li><strong>Σ 8 pliegues:</strong> {{ item.comp.suma_8_pliegues if item.comp.suma_8_pliegues is not none else '—' }} mm</li>
                     <li><strong>SC (Du Bois):</strong> {{ item.comp.superficie_corporal if item.comp.superficie_corporal is not none else '—' }} m²</li>
                 </ul>
+                {% if not item.es_referencia %}
                 <a href="{{ url_for('antropometrias.informe', id=item.antropometria.id) }}"
                    class="btn btn-sm btn-outline-success">Ver informe completo</a>
+                     <a href="{{ url_for('referencias.nueva_desde_antropometria', id=item.antropometria.id) }}"
+                         class="btn btn-sm btn-outline-primary">Crear referencia desde esta medición</a>
+                {% endif %}
             </div>
             {% endfor %}
         </div>

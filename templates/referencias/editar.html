@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Editar Referencia — Albatros Rugby Club{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3" data-reveal>
+    <h2>Editar referencia</h2>
+    <a href="{{ url_for('referencias.listar') }}" class="btn btn-outline-secondary">Volver</a>
+</div>
+
+<div class="card" data-reveal>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('referencias.actualizar', id=referencia.id) }}">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label" for="nombre">Nombre</label>
+                    <input type="text" class="form-control" id="nombre" name="nombre" value="{{ referencia.nombre }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="deporte">Deporte</label>
+                    <input type="text" class="form-control" id="deporte" name="deporte" value="{{ referencia.deporte }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="categoria">Categoría</label>
+                    <input type="text" class="form-control" id="categoria" name="categoria" value="{{ referencia.categoria or '' }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="posicion">Posición</label>
+                    <input type="text" class="form-control" id="posicion" name="posicion" value="{{ referencia.posicion or '' }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="sexo">Sexo</label>
+                    <select class="form-select" id="sexo" name="sexo">
+                        <option value="" {% if not referencia.sexo %}selected{% endif %}>No especificado</option>
+                        <option value="Masculino" {% if referencia.sexo == 'Masculino' %}selected{% endif %}>Masculino</option>
+                        <option value="Femenino" {% if referencia.sexo == 'Femenino' %}selected{% endif %}>Femenino</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="peso">Peso (kg)</label>
+                    <input type="number" step="0.01" min="0" class="form-control" id="peso" name="peso" value="{{ referencia.peso if referencia.peso is not none else '' }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="pct_grasa">% Grasa</label>
+                    <input type="number" step="0.01" min="0" class="form-control" id="pct_grasa" name="pct_grasa" value="{{ referencia.pct_grasa if referencia.pct_grasa is not none else '' }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="masa_adiposa">Masa adiposa (kg)</label>
+                    <input type="number" step="0.01" min="0" class="form-control" id="masa_adiposa" name="masa_adiposa" value="{{ referencia.masa_adiposa if referencia.masa_adiposa is not none else '' }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="pct_muscular">% Muscular</label>
+                    <input type="number" step="0.01" min="0" class="form-control" id="pct_muscular" name="pct_muscular" value="{{ referencia.pct_muscular if referencia.pct_muscular is not none else '' }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="masa_muscular">Masa muscular (kg)</label>
+                    <input type="number" step="0.01" min="0" class="form-control" id="masa_muscular" name="masa_muscular" value="{{ referencia.masa_muscular if referencia.masa_muscular is not none else '' }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="masa_osea">Masa osea (kg)</label>
+                    <input type="number" step="0.01" min="0" class="form-control" id="masa_osea" name="masa_osea" value="{{ referencia.masa_osea if referencia.masa_osea is not none else '' }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="masa_residual">Masa residual (kg)</label>
+                    <input type="number" step="0.01" min="0" class="form-control" id="masa_residual" name="masa_residual" value="{{ referencia.masa_residual if referencia.masa_residual is not none else '' }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="masa_piel">Masa piel (kg)</label>
+                    <input type="number" step="0.01" min="0" class="form-control" id="masa_piel" name="masa_piel" value="{{ referencia.masa_piel if referencia.masa_piel is not none else '' }}">
+                </div>
+                <div class="col-12">
+                    <label class="form-label" for="descripcion">Descripción</label>
+                    <textarea class="form-control" id="descripcion" name="descripcion" rows="2">{{ referencia.descripcion or '' }}</textarea>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

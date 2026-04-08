@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% block title %}Tablas de Referencia — Albatros Rugby Club{% endblock %}
+{% block content %}
+{% set prefill = referencia_prefill or {} %}
+<div class="d-flex justify-content-between align-items-center mb-3" data-reveal>
+    <div>
+        <h2>Tablas de Referencia</h2>
+        <p class="text-muted mb-0">Cargá perfiles de referencia por deporte para compararlos en antropometrías.</p>
+    </div>
+    <a href="{{ url_for('jugadores.listar') }}" class="btn btn-outline-secondary">Volver</a>
+</div>
+
+<div class="card mb-4" data-reveal>
+    <div class="card-header">Nueva referencia</div>
+    <div class="card-body">
+        {% if prefill.get('nombre') %}
+        <div class="alert alert-info py-2">
+            Formulario precargado desde una medición. Revisá y guardá la referencia.
+        </div>
+        {% endif %}
+        <form method="POST" action="{{ url_for('referencias.crear') }}">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label" for="nombre">Nombre</label>
+                    <input type="text" class="form-control" id="nombre" name="nombre" value="{{ prefill.get('nombre', '') }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="deporte">Deporte</label>
+                    <input type="text" class="form-control" id="deporte" name="deporte" placeholder="Ej: Rugby" value="{{ prefill.get('deporte', '') }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="categoria">Categoría</label>
+                    <input type="text" class="form-control" id="categoria" name="categoria" placeholder="Ej: M19 / Plantel superior" value="{{ prefill.get('categoria', '') }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="posicion">Posición</label>
+                    <input type="text" class="form-control" id="posicion" name="posicion" placeholder="Opcional" value="{{ prefill.get('posicion', '') }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="sexo">Sexo</label>
+                    <select class="form-select" id="sexo" name="sexo">
+                        <option value="" {% if not prefill.get('sexo') %}selected{% endif %}>No especificado</option>
+                        <option value="Masculino" {% if prefill.get('sexo') == 'Masculino' %}selected{% endif %}>Masculino</option>
+                        <option value="Femenino" {% if prefill.get('sexo') == 'Femenino' %}selected{% endif %}>Femenino</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="peso">Peso (kg)</label>
+                    <input type="number" step="0.01" min="0" class="form-control" id="peso" name="peso" value="{{ prefill.get('peso', '') }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="pct_grasa">% Grasa</label>
+                    <input type="number" step="0.01" min="0" class="form-control" id="pct_grasa" name="pct_grasa" value="{{ prefill.get('pct_grasa', '') }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="masa_adiposa">Masa adiposa (kg)</label>
+                    <input type="number" step="0.01" min="0" class="form-control" id="masa_adiposa" name="masa_adiposa" value="{{ prefill.get('masa_adiposa', '') }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="pct_muscular">% Muscular</label>
+                    <input type="number" step="0.01" min="0" class="form-control" id="pct_muscular" name="pct_muscular" value="{{ prefill.get('pct_muscular', '') }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="masa_muscular">Masa muscular (kg)</label>
+                    <input type="number" step="0.01" min="0" class="form-control" id="masa_muscular" name="masa_muscular" value="{{ prefill.get('masa_muscular', '') }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="masa_osea">Masa osea (kg)</label>
+                    <input type="number" step="0.01" min="0" class="form-control" id="masa_osea" name="masa_osea" value="{{ prefill.get('masa_osea', '') }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="masa_residual">Masa residual (kg)</label>
+                    <input type="number" step="0.01" min="0" class="form-control" id="masa_residual" name="masa_residual" value="{{ prefill.get('masa_residual', '') }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="masa_piel">Masa piel (kg)</label>
+                    <input type="number" step="0.01" min="0" class="form-control" id="masa_piel" name="masa_piel" value="{{ prefill.get('masa_piel', '') }}">
+                </div>
+                <div class="col-12">
+                    <label class="form-label" for="descripcion">Descripción</label>
+                    <textarea class="form-control" id="descripcion" name="descripcion" rows="2" placeholder="Fuente o notas de la referencia">{{ prefill.get('descripcion', '') }}</textarea>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Guardar referencia</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card" data-reveal>
+    <div class="card-header">Referencias cargadas</div>
+    <div class="card-body">
+        {% if referencias %}
+        <div class="row g-3 mb-3">
+            <div class="col-md-4">
+                <label class="form-label" for="ref-search-input">Buscar</label>
+                <input type="text" id="ref-search-input" class="form-control" placeholder="Nombre, deporte o categoría">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label" for="ref-filter-deporte">Deporte</label>
+                <input type="text" id="ref-filter-deporte" class="form-control" placeholder="Filtrar por deporte">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label" for="ref-filter-categoria">Categoría</label>
+                <input type="text" id="ref-filter-categoria" class="form-control" placeholder="Filtrar por categoría">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label" for="ref-filter-sexo">Sexo</label>
+                <select id="ref-filter-sexo" class="form-select">
+                    <option value="">Todos</option>
+                    <option value="Masculino">Masculino</option>
+                    <option value="Femenino">Femenino</option>
+                </select>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Deporte</th>
+                        <th>Categoría</th>
+                        <th>Sexo</th>
+                        <th>Peso</th>
+                        <th>% Grasa</th>
+                        <th>% Muscular</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="referencias-table-body">
+                    {% for r in referencias %}
+                    <tr data-nombre="{{ r.nombre }}" data-deporte="{{ r.deporte }}" data-categoria="{{ r.categoria or '' }}" data-sexo="{{ r.sexo or '' }}">
+                        <td>{{ r.nombre }}</td>
+                        <td>{{ r.deporte }}</td>
+                        <td>{{ r.categoria or '—' }}</td>
+                        <td>{{ r.sexo or '—' }}</td>
+                        <td>{{ r.peso if r.peso is not none else '—' }}</td>
+                        <td>{{ r.pct_grasa if r.pct_grasa is not none else '—' }}</td>
+                        <td>{{ r.pct_muscular if r.pct_muscular is not none else '—' }}</td>
+                        <td class="btn-group-actions">
+                            <a href="{{ url_for('referencias.editar', id=r.id) }}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                            <form method="POST" action="{{ url_for('referencias.eliminar', id=r.id) }}" class="d-inline"
+                                  onsubmit="return confirm('¿Seguro que querés eliminar esta referencia?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">No hay referencias cargadas.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
